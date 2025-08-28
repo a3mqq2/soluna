@@ -14,6 +14,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\ShippingTypeController;
 use App\Http\Controllers\DeliveryPriceController;
+use App\Http\Controllers\InvoiceExpenseController;
 use App\Http\Controllers\InvoicePaymentController;
 
 /*
@@ -70,6 +71,13 @@ Route::middleware(['auth'])->group(function () {
         ->name('invoices.payment');
         
 
+
+        Route::prefix('invoices/{invoice}')->group(function () {
+            Route::post('/expenses', [InvoiceExpenseController::class, 'store'])->name('invoices.expenses.store');
+            Route::put('/expenses/{expense}', [InvoiceExpenseController::class, 'update'])->name('invoices.expenses.update');
+            Route::delete('/expenses/{expense}', [InvoiceExpenseController::class, 'destroy'])->name('invoices.expenses.destroy');
+        });
+        
 
         Route::resource('coupons', CouponController::class);
         Route::post('coupons/{coupon}/toggle', [CouponController::class, 'toggle'])

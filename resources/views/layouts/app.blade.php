@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
-    <title> SOLUNA للشحن والتوصيل | @yield('title', 'الصفحة الرئيسة')</title>
+    <title> SOLUNA لتجهيز المناسبات | @yield('title', 'الصفحة الرئيسة')</title>
     {{-- [Meta] --}}
     <meta charset="utf-8" />
     <meta

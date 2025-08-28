@@ -452,6 +452,7 @@
                             <th>المبلغ الكلي</th>
                             <th>المبلغ المدفوع</th>
                             <th>المبلغ المتبقي</th>
+                            <th> صافي الربح </th>
                             <th>الحالة</th>
                             <th width="220" class="text-center">الإجراءات</th>
                         </tr>
@@ -475,10 +476,11 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-muted">{{ $invoice->invoice_date->format('Y/m/d') }}</td>
+                                <td class="text-muted">{{ $invoice->invoice_date }}</td>
                                 <td class="amount-cell" style="color: #b48b1e;">{{ number_format($invoice->total, 2) }} د.ل</td>
                                 <td class="amount-cell text-success">{{ number_format($invoice->paid_amount, 2) }} د.ل</td>
                                 <td class="amount-cell text-warning">{{ number_format($invoice->remaining_amount, 2) }} د.ل</td>
+                                <td class="amount-cell" style="color: #379627;">{{ number_format($invoice->net_profit, 2) }} د.ل</td>
                                 <td>
                                     <span class="invoice-status-badge status-{{ $invoice->status }}">
                                         @switch($invoice->status)

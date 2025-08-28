@@ -12,14 +12,44 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $invoices = Invoice::with(['customer', 'items.service'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-
+        $query = \App\Models\Invoice::query()->with('customer');
+    
+        // 🔍 البحث
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%")
+                         ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
+        }
+    
+        // ✅ الفلترة بالحالة
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+    
+        // 📅 فلترة التاريخ
+        if ($request->filled('date_from')) {
+            $query->whereDate('invoice_date', '>=', $request->get('date_from'));
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('invoice_date', '<=', $request->get('date_to'));
+        }
+    
+        // ⏱️ ترتيب
+        $query->orderBy('invoice_date', 'desc');
+    
+        // 📑 ترقيم الصفحات
+        $invoices = $query->paginate(10);
+    
         return view('invoices.index', compact('invoices'));
     }
+    
 
     public function create()
     {

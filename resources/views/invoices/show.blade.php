@@ -92,6 +92,20 @@
         color: #b48b1e;
     }
     
+    .expense-amount {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        font-size: 16px;
+        color: #dc3545;
+    }
+    
+    .profit-amount {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        font-size: 18px;
+        color: #28a745;
+    }
+    
     .table-elegant {
         margin: 0;
         border-collapse: separate;
@@ -138,6 +152,14 @@
         padding: 20px;
     }
     
+    .profit-summary-card {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+    }
+    
     .summary-item {
         display: flex;
         justify-content: space-between;
@@ -174,6 +196,29 @@
     .btn-primary:hover {
         background: #8a6817;
         border-color: #8a6817;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        border-color: #c82333;
+    }
+    
+    .empty-expenses {
+        text-align: center;
+        padding: 40px 20px;
+        color: #8a6817;
+    }
+    
+    .empty-expenses i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.6;
+        color: #dc3545;
     }
     
     .empty-payments {
@@ -216,7 +261,7 @@
             padding: 20px;
         }
         
-        .summary-card {
+        .summary-card, .profit-summary-card {
             margin-top: 20px;
         }
         
@@ -266,7 +311,7 @@
                                 </tr>
                                 <tr>
                                     <th width="25%" style="background-color: #faf8f6; color: #b48b1e; font-weight: 600;">تاريخ الفاتورة</th>
-                                    <td>{{ $invoice->invoice_date->format('Y/m/d') }}</td>
+                                    <td>{{ $invoice->invoice_date }}</td>
                                 </tr>
                                 <tr>
                                     <th width="25%" style="background-color: #faf8f6; color: #b48b1e; font-weight: 600;">حالة الفاتورة</th>
@@ -297,7 +342,7 @@
             <!-- Invoice Items -->
             <div class="invoice-card">
                 <div class="card-header">
-                    <h6><i class="ti ti-list me-2"></i>بنود الفاتورة</h6>
+                    <h6><i class="ti ti-list me-2"></i>بنود الفاتورة (المبيعات)</h6>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -327,6 +372,59 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- Invoice Expenses -->
+            <div class="invoice-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6><i class="ti ti-receipt-2 me-2"></i>المصروفات</h6>
+                    <button class="btn btn-sm btn-danger btn-elegant no-print" 
+                            onclick="showExpenseModal({{ $invoice->id }})">
+                        <i class="ti ti-plus me-1"></i>
+                        إضافة مصروف
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    @if($invoice->expenses && $invoice->expenses->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-elegant">
+                                <thead>
+                                    <tr>
+                                        <th>وصف المصروف</th>
+                                        <th width="150">المبلغ</th>
+                                        <th width="100" class="no-print">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($invoice->expenses as $expense)
+                                    <tr>
+                                        <td>{{ $expense->description }}</td>
+                                        <td class="expense-amount">{{ number_format($expense->amount, 3) }} د.ل</td>
+                                        <td class="no-print">
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="editExpense({{ $expense->id }}, '{{ $expense->description }}', {{ $expense->amount }})"
+                                                    title="تعديل">
+                                                <i class="ti ti-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    onclick="confirmDeleteExpense({{ $expense->id }})"
+                                                    title="حذف">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="empty-expenses">
+                            <i class="ti ti-receipt-off"></i>
+                            <h6>لا توجد مصروفات</h6>
+                            <p class="text-muted">لم يتم تسجيل أي مصروف لهذه الفاتورة بعد</p>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -410,6 +508,11 @@
                                         onclick="showPaymentModal({{ $invoice->id }}, {{ $invoice->remaining_amount }})">
                                     <i class="ti ti-cash me-2"></i>إضافة دفعة
                                 </button>
+                                
+                                <button class="btn btn-danger btn-elegant" 
+                                        onclick="showExpenseModal({{ $invoice->id }})">
+                                    <i class="ti ti-receipt-2 me-2"></i>إضافة مصروف
+                                </button>
                             @endif
                             
                             <a href="{{ route('invoices.index') }}" class="btn btn-outline-secondary btn-elegant">
@@ -419,7 +522,7 @@
                     </div>
                 </div>
 
-                <!-- Summary Card -->
+                <!-- Financial Summary Card -->
                 <div class="summary-card">
                     <h6 class="mb-3 text-white">
                         <i class="ti ti-calculator me-2"></i>
@@ -427,7 +530,7 @@
                     </h6>
                     
                     <div class="summary-item">
-                        <span>المجموع الفرعي:</span>
+                        <span>إجمالي المبيعات:</span>
                         <span>{{ number_format($invoice->subtotal, 3) }} د.ل</span>
                     </div>
                     
@@ -439,8 +542,13 @@
                     @endif
                     
                     <div class="summary-item">
-                        <span>إجمالي الفاتورة:</span>
+                        <span>إجمالي بعد الخصم:</span>
                         <span>{{ number_format($invoice->total, 3) }} د.ل</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>إجمالي المصروفات:</span>
+                        <span style="color: #ffcccc;">{{ number_format($invoice->expenses_total ?? 0, 3) }} د.ل</span>
                     </div>
                     
                     <div class="summary-item">
@@ -451,6 +559,30 @@
                     <div class="summary-item">
                         <span>المبلغ المتبقي:</span>
                         <span>{{ number_format($invoice->remaining_amount, 3) }} د.ل</span>
+                    </div>
+                </div>
+
+                <!-- Profit Summary Card -->
+                <div class="profit-summary-card">
+                    <h6 class="mb-3 text-white">
+                        <i class="ti ti-trending-up me-2"></i>
+                        تحليل الربح
+                    </h6>
+                    
+                    <div class="summary-item">
+                        <span>صافي الربح:</span>
+                        <span class="fw-bold">{{ number_format(($invoice->total - ($invoice->expenses_total ?? 0)), 3) }} د.ل</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>هامش الربح:</span>
+                        <span class="fw-bold">
+                            @if($invoice->subtotal > 0)
+                                {{ number_format((($invoice->total - ($invoice->expenses_total ?? 0)) / $invoice->subtotal) * 100, 1) }}%
+                            @else
+                                0%
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
@@ -529,6 +661,43 @@
         </div>
     </div>
 </div>
+
+<!-- Expense Modal -->
+<div class="modal fade" id="expenseModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none;">
+            <form id="expenseForm" method="POST">
+                @csrf
+                <div class="modal-header" style="background: #dc3545; color: white; border: none; border-radius: 12px 12px 0 0;">
+                    <h5 class="modal-title text-white fw-bold">
+                        <i class="ti ti-receipt-2 me-2"></i>
+                        <span id="expenseModalTitle">إضافة مصروف</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">وصف المصروف</label>
+                        <input type="text" name="description" class="form-control" placeholder="مثال: رسوم شحن، عمولة مندوب، مصاريف إعلان" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">مبلغ المصروف</label>
+                        <input type="number" name="amount" step="0.001" min="0.001" class="form-control" placeholder="0.000" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4">
+                    <button type="button" class="btn btn-outline-secondary btn-elegant" data-bs-dismiss="modal">
+                        <i class="ti ti-x"></i> إلغاء
+                    </button>
+                    <button type="submit" class="btn btn-danger btn-elegant">
+                        <i class="ti ti-check"></i> حفظ المصروف
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -542,6 +711,67 @@ function showPaymentModal(invoiceId, remainingAmount) {
     
     const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
     modal.show();
+}
+
+function showExpenseModal(invoiceId) {
+    document.getElementById('expenseForm').reset();
+    document.getElementById('expenseModalTitle').textContent = 'إضافة مصروف';
+    document.getElementById('expenseForm').action = `/invoices/${invoiceId}/expenses`;
+    
+    // إزالة method input إذا كان موجود (للإضافة الجديدة)
+    const methodInput = document.querySelector('#expenseForm input[name="_method"]');
+    if (methodInput) {
+        methodInput.remove();
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('expenseModal'));
+    modal.show();
+}
+
+function editExpense(expenseId, description, amount) {
+    document.getElementById('expenseForm').reset();
+    document.getElementById('expenseModalTitle').textContent = 'تعديل المصروف';
+    document.querySelector('#expenseForm input[name="description"]').value = description;
+    document.querySelector('#expenseForm input[name="amount"]').value = amount;
+    
+    // تحديد الـ action للتعديل
+    document.getElementById('expenseForm').action = `/invoices/{{ $invoice->id }}/expenses/${expenseId}`;
+    
+    // إضافة method PUT للتعديل
+    let methodInput = document.querySelector('#expenseForm input[name="_method"]');
+    if (!methodInput) {
+        methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        document.getElementById('expenseForm').appendChild(methodInput);
+    }
+    methodInput.value = 'PUT';
+    
+    const modal = new bootstrap.Modal(document.getElementById('expenseModal'));
+    modal.show();
+}
+
+function confirmDeleteExpense(expenseId) {
+    if (confirm('هل أنت متأكد من حذف هذا المصروف؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/invoices/{{ $invoice->id }}/expenses/${expenseId}`;
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        
+        form.appendChild(csrfInput);
+        form.appendChild(methodInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
 function toggleReferenceField() {
@@ -608,6 +838,39 @@ document.getElementById('paymentForm').addEventListener('submit', function(e) {
             toastr.error('يرجى اختيار طريقة الدفع');
         } else {
             alert('يرجى اختيار طريقة الدفع');
+        }
+        return;
+    }
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>جاري الحفظ...';
+    submitBtn.disabled = true;
+    
+    this.submit();
+});
+
+document.getElementById('expenseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const amount = parseFloat(formData.get('amount'));
+    const description = formData.get('description').trim();
+    
+    if (!description) {
+        if (window.toastr) {
+            toastr.error('يرجى إدخال وصف المصروف');
+        } else {
+            alert('يرجى إدخال وصف المصروف');
+        }
+        return;
+    }
+    
+    if (!amount || amount <= 0) {
+        if (window.toastr) {
+            toastr.error('يرجى إدخال مبلغ صالح للمصروف');
+        } else {
+            alert('يرجى إدخال مبلغ صالح للمصروف');
         }
         return;
     }
