@@ -20,6 +20,7 @@ class Invoice extends Model
         'net_profit',
         'paid_amount',
         'remaining_amount',
+        'invoice_date',
     ];
 
     protected $casts = [
