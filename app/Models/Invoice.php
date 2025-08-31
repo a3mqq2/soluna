@@ -21,6 +21,7 @@ class Invoice extends Model
         'paid_amount',
         'remaining_amount',
         'invoice_date',
+        'user_id'
     ];
 
     protected $casts = [
