@@ -93,7 +93,7 @@ class InvoiceController extends Controller
                 'discount' => $validated['discount'] ?? 0,
                 'paid_amount' => $validated['paid_amount'] ?? 0,
                 'notes' => $validated['notes'],
-                'user_id' => auth()->id(),
+                'user_id' => auth()->id() ?? 1,
             ]);
 
             foreach ($validated['items'] as $item) {
