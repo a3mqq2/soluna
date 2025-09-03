@@ -6,6 +6,8 @@ use App\Models\Invoice;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Models\InvoiceItem;
+use App\Models\InvoiceExpense;
+use App\Models\InvoicePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -19,8 +21,11 @@ class ReportController extends Controller
         $fromDate = $dateRange['from'];
         $toDate = $dateRange['to'];
 
-        // Get main statistics
+        // Get main statistics with profitability
         $stats = $this->getMainStats($fromDate, $toDate);
+        
+        // Get profitability analysis
+        $invoiceProfitability = $this->getInvoiceProfitability($fromDate, $toDate);
         
         // Get top services
         $topServices = $this->getTopServices($fromDate, $toDate);
@@ -28,10 +33,16 @@ class ReportController extends Controller
         // Get invoice status distribution
         $invoiceStats = $this->getInvoiceStats($fromDate, $toDate);
         
-        // Get top customers
+        // Get expense categories
+        $expenseCategories = $this->getExpenseCategories($fromDate, $toDate);
+        
+        // Get top customers with profitability
         $topCustomers = $this->getTopCustomers($fromDate, $toDate);
         
-        // Get monthly revenue trend
+        // Get monthly profit trend
+        $monthlyProfit = $this->getMonthlyProfit($fromDate, $toDate);
+        
+        // Get monthly revenue trend (keeping original for compatibility)
         $monthlyRevenue = $this->getMonthlyRevenue($fromDate, $toDate);
         
         // Get invoice registrations
@@ -42,9 +53,12 @@ class ReportController extends Controller
 
         return view('reports.index', compact(
             'stats', 
+            'invoiceProfitability',
             'topServices', 
-            'invoiceStats', 
+            'invoiceStats',
+            'expenseCategories',
             'topCustomers', 
+            'monthlyProfit',
             'monthlyRevenue',
             'invoiceRegistrations',
             'paymentRegistrations'
@@ -91,8 +105,17 @@ class ReportController extends Controller
     {
         $invoicesQuery = Invoice::whereBetween('invoice_date', [$fromDate, $toDate]);
         
+        // Basic stats
         $totalInvoices = $invoicesQuery->count();
-        $totalRevenue = $invoicesQuery->sum('total');
+        $totalRevenue = $invoicesQuery->sum('subtotal'); // Revenue from items only
+        $totalExpenses = InvoiceExpense::whereIn('invoice_id', 
+            $invoicesQuery->pluck('id')
+        )->sum('amount');
+
+        
+        $totalDiscount = $invoicesQuery->sum('discount');
+        $netProfit = $totalRevenue - $totalExpenses - $totalDiscount;
+        
         $totalCustomers = Customer::count();
         $outstandingAmount = Invoice::where('remaining_amount', '>', 0)->sum('remaining_amount');
         
@@ -107,6 +130,10 @@ class ReportController extends Controller
         return [
             'total_invoices' => $totalInvoices,
             'total_revenue' => $totalRevenue,
+            'total_expenses' => $totalExpenses,
+            'total_discount' => $totalDiscount,
+            'net_profit' => $netProfit,
+            'profit_margin' => $totalRevenue > 0 ? ($netProfit / $totalRevenue) * 100 : 0,
             'total_customers' => $totalCustomers,
             'outstanding_amount' => $outstandingAmount,
             'avg_invoice_amount' => $avgInvoiceAmount,
@@ -114,6 +141,21 @@ class ReportController extends Controller
             'partial_invoices' => $partialInvoices,
             'unpaid_invoices' => $unpaidInvoices,
         ];
+    }
+
+    private function getInvoiceProfitability($fromDate, $toDate)
+    {
+        return Invoice::with(['customer', 'expenses'])
+            ->whereBetween('invoice_date', [$fromDate, $toDate])
+            ->get()
+            ->map(function ($invoice) {
+                $invoice->expenses_total = $invoice->expenses->sum('amount');
+                $invoice->net_profit = $invoice->subtotal - $invoice->expenses_total - $invoice->discount;
+                $invoice->profit_margin = $invoice->subtotal > 0 ? 
+                    ($invoice->net_profit / $invoice->subtotal) * 100 : 0;
+                return $invoice;
+            })
+            ->sortByDesc('net_profit');
     }
 
     private function getTopServices($fromDate, $toDate)
@@ -143,20 +185,60 @@ class ReportController extends Controller
             ->get();
     }
 
+    private function getExpenseCategories($fromDate, $toDate)
+    {
+        return InvoiceExpense::join('invoices', 'invoice_expenses.invoice_id', '=', 'invoices.id')
+            ->whereBetween('invoices.invoice_date', [$fromDate, $toDate])
+            ->groupBy('description')
+            ->selectRaw('description, SUM(amount) as total_amount, COUNT(*) as count')
+            ->orderByDesc('total_amount')
+            ->limit(10)
+            ->get();
+    }
+
     private function getTopCustomers($fromDate, $toDate)
     {
         return DB::table('invoices')
             ->join('customers', 'invoices.customer_id', '=', 'customers.id')
+            ->leftJoin('invoice_expenses', 'invoice_expenses.invoice_id', '=', 'invoices.id')
             ->whereBetween('invoices.invoice_date', [$fromDate, $toDate])
             ->select(
                 'customers.name as customer_name',
-                DB::raw('COUNT(invoices.id) as invoice_count'),
-                DB::raw('SUM(invoices.total) as total_spent')
+                DB::raw('COUNT(DISTINCT invoices.id) as invoice_count'),
+                DB::raw('SUM(invoices.total) as total_spent'),
+                DB::raw('SUM(invoices.subtotal - COALESCE(invoice_expenses.amount, 0) - invoices.discount) as total_profit')
             )
             ->groupBy('customers.id', 'customers.name')
-            ->orderBy('total_spent', 'desc')
+            ->orderBy('total_profit', 'desc')
             ->limit(10)
             ->get();
+    }
+
+    private function getMonthlyProfit($fromDate, $toDate)
+    {
+        // Get monthly profit data for the last 6 months or within the specified range
+        $startDate = max($fromDate, Carbon::now()->subMonths(6)->startOfMonth());
+        
+        return DB::table('invoices')
+            ->leftJoin('invoice_expenses', 'invoice_expenses.invoice_id', '=', 'invoices.id')
+            ->whereBetween('invoices.invoice_date', [$startDate, $toDate])
+            ->select(
+                DB::raw('YEAR(invoices.invoice_date) as year'),
+                DB::raw('MONTH(invoices.invoice_date) as month'),
+                DB::raw('SUM(invoices.subtotal) as revenue'),
+                DB::raw('SUM(COALESCE(invoice_expenses.amount, 0)) as expenses'),
+                DB::raw('SUM(invoices.discount) as discounts'),
+                DB::raw('SUM(invoices.subtotal - COALESCE(invoice_expenses.amount, 0) - invoices.discount) as net_profit'),
+                DB::raw('COUNT(DISTINCT invoices.id) as invoice_count')
+            )
+            ->groupBy(DB::raw('YEAR(invoices.invoice_date)'), DB::raw('MONTH(invoices.invoice_date)'))
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get()
+            ->map(function ($item) {
+                $item->month_name = Carbon::create($item->year, $item->month, 1)->format('M Y');
+                return $item;
+            });
     }
 
     private function getMonthlyRevenue($fromDate, $toDate)

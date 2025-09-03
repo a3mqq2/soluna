@@ -42,7 +42,7 @@ class InvoiceExpenseController extends Controller
     /**
      * Update an existing expense
      */
-    public function update(Request $request, Invoice $invoice, InvoiceExpense $expense): JsonResponse
+    public function update(Request $request, Invoice $invoice, InvoiceExpense $expense)
     {
         // التأكد من أن المصروف ينتمي للفاتورة
         if ($expense->invoice_id !== $invoice->id) {

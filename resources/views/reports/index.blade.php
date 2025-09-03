@@ -38,11 +38,12 @@
         height: 4px;
     }
     
-    .stats-card-primary::before { background: linear-gradient(90deg, #b48b1e 0%, #8a6817 100%); }
-    .stats-card-success::before { background: linear-gradient(90deg, #28a745 0%, #20c997 100%); }
-    .stats-card-warning::before { background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%); }
-    .stats-card-danger::before { background: linear-gradient(90deg, #dc3545 0%, #e83e8c 100%); }
-    .stats-card-info::before { background: linear-gradient(90deg, #17a2b8 0%, #6f42c1 100%); }
+    .stats-card-primary::before { background: #b48b1e; }
+    .stats-card-success::before { background: #28a745; }
+    .stats-card-warning::before { background: #ffc107; }
+    .stats-card-danger::before { background: #dc3545; }
+    .stats-card-info::before { background: #17a2b8; }
+    .stats-card-profit::before { background: #e8c9c0; }
     
     .stats-card-body {
         padding: 25px;
@@ -68,6 +69,14 @@
         margin-bottom: 8px;
         font-family: 'Courier New', monospace;
         color: #333;
+    }
+    
+    .stats-value.profit-positive {
+        color: #28a745;
+    }
+    
+    .stats-value.profit-negative {
+        color: #dc3545;
     }
     
     .stats-label {
@@ -101,7 +110,7 @@
     }
     
     .report-card .card-header {
-        background: linear-gradient(135deg, #faf8f6 0%, #f5f3f1 100%);
+        background: #faf8f6;
         border-bottom: 2px solid #e8c9c0;
         border-radius: 15px 15px 0 0;
         padding: 20px 25px;
@@ -129,7 +138,7 @@
     }
     
     .table-elegant thead th {
-        background: linear-gradient(135deg, #b48b1e 0%, #8a6817 100%);
+        background: #b48b1e;
         color: white;
         font-weight: 700;
         text-transform: uppercase;
@@ -155,6 +164,19 @@
         font-family: 'Courier New', monospace;
         font-weight: 600;
         color: #b48b1e;
+    }
+    
+    .profit-cell {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+    }
+    
+    .profit-positive {
+        color: #28a745;
+    }
+    
+    .profit-negative {
+        color: #dc3545;
     }
     
     .chart-container {
@@ -183,7 +205,7 @@
     
     .progress-bar {
         border-radius: 10px;
-        background: linear-gradient(90deg, #b48b1e 0%, #8a6817 100%);
+        background: #b48b1e;
     }
     
     .empty-state {
@@ -213,6 +235,14 @@
         background: #b48b1e;
         color: white;
         border-color: #8a6817;
+    }
+    
+    .profitability-summary {
+        background: linear-gradient(135deg, #e8c9c0 0%, #f5f3f1 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 2px solid #b48b1e;
     }
     
     @media (max-width: 768px) {
@@ -260,6 +290,39 @@
         </form>
     </div>
 
+    <!-- Profitability Summary -->
+    @php
+        $totalRevenue = $stats['total_revenue'] ?? 0;
+        $totalExpenses = $stats['total_expenses'] ?? 0;
+        $netProfit = $totalRevenue - $totalExpenses;
+        $profitMargin = $totalRevenue > 0 ? ($netProfit / $totalRevenue) * 100 : 0;
+    @endphp
+    
+    <div class="profitability-summary">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h4 class="amount-cell">{{ number_format($totalRevenue, 3) }} د.ل</h4>
+                <small class="text-muted">إجمالي الإيرادات</small>
+            </div>
+            <div class="col-md-3">
+                <h4 class="text-danger">{{ number_format($totalExpenses, 3) }} د.ل</h4>
+                <small class="text-muted">إجمالي المصاريف</small>
+            </div>
+            <div class="col-md-3">
+                <h4 class="profit-cell {{ $netProfit >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                    {{ number_format($netProfit, 3) }} د.ل
+                </h4>
+                <small class="text-muted">صافي الربح</small>
+            </div>
+            <div class="col-md-3">
+                <h4 class="profit-cell {{ $profitMargin >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                    {{ number_format($profitMargin, 1) }}%
+                </h4>
+                <small class="text-muted">هامش الربح</small>
+            </div>
+        </div>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="row">
         <div class="col-xl-3 col-md-6">
@@ -270,12 +333,6 @@
                     </div>
                     <div class="stats-value">{{ $stats['total_invoices'] ?? 0 }}</div>
                     <div class="stats-label">إجمالي الفواتير</div>
-                    @if(isset($stats['invoices_change']))
-                        <div class="stats-change {{ $stats['invoices_change'] >= 0 ? 'positive' : 'negative' }}">
-                            <i class="ti ti-trending-{{ $stats['invoices_change'] >= 0 ? 'up' : 'down' }}"></i>
-                            {{ abs($stats['invoices_change']) }}% عن الفترة السابقة
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -286,7 +343,7 @@
                     <div class="stats-icon">
                         <i class="ti ti-currency-dollar"></i>
                     </div>
-                    <div class="stats-value">{{ number_format($stats['total_revenue'] ?? 0, 0) }}</div>
+                    <div class="stats-value">{{ number_format($totalRevenue, 0) }}</div>
                     <div class="stats-label">إجمالي الإيرادات (د.ل)</div>
                 </div>
             </div>
@@ -296,22 +353,88 @@
             <div class="stats-card stats-card-warning">
                 <div class="stats-card-body">
                     <div class="stats-icon">
-                        <i class="ti ti-users"></i>
+                        <i class="ti ti-trending-down"></i>
                     </div>
-                    <div class="stats-value">{{ $stats['total_customers'] ?? 0 }}</div>
-                    <div class="stats-label">إجمالي الزبائن</div>
+                    <div class="stats-value">{{ number_format($totalExpenses, 0) }}</div>
+                    <div class="stats-label">إجمالي المصاريف (د.ل)</div>
                 </div>
             </div>
         </div>
         
         <div class="col-xl-3 col-md-6">
-            <div class="stats-card stats-card-danger">
+            <div class="stats-card stats-card-profit">
                 <div class="stats-card-body">
                     <div class="stats-icon">
-                        <i class="ti ti-alert-circle"></i>
+                        <i class="ti ti-trending-up"></i>
                     </div>
-                    <div class="stats-value">{{ number_format($stats['outstanding_amount'] ?? 0, 0) }}</div>
-                    <div class="stats-label">المستحقات (د.ل)</div>
+                    <div class="stats-value {{ $netProfit >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                        {{ number_format($netProfit, 0) }}
+                    </div>
+                    <div class="stats-label">صافي الربح (د.ل)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Invoice Profitability Analysis -->
+        <div class="col-lg-12">
+            <div class="card report-card">
+                <div class="card-header">
+                    <h5>تحليل ربحية الفواتير</h5>
+                </div>
+                <div class="card-body">
+                    @if(isset($invoiceProfitability) && count($invoiceProfitability) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-elegant">
+                                <thead>
+                                    <tr>
+                                        <th>رقم الفاتورة</th>
+                                        <th>الزبون</th>
+                                        <th>الإيرادات</th>
+                                        <th>المصاريف</th>
+                                        <th>الخصم</th>
+                                        <th>صافي الربح</th>
+                                        <th>هامش الربح %</th>
+                                        <th>تاريخ الفاتورة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($invoiceProfitability as $invoice)
+                                        @php
+                                            $subtotal = $invoice->subtotal;
+                                            $expenses = $invoice->expenses_total;
+                                            $discount = $invoice->discount;
+                                            $netProfit = $subtotal - $expenses - $discount;
+                                            $profitMargin = $subtotal > 0 ? ($netProfit / $subtotal) * 100 : 0;
+                                        @endphp
+                                        <tr>
+                                            <td class="text-start">
+                                                <strong>{{ $invoice->invoice_number }}</strong>
+                                            </td>
+                                            <td class="text-start">{{ $invoice->customer->name ?? '-' }}</td>
+                                            <td class="amount-cell">{{ number_format($subtotal, 3) }} د.ل</td>
+                                            <td class="text-danger">{{ number_format($expenses, 3) }} د.ل</td>
+                                            <td class="text-warning">{{ number_format($discount, 3) }} د.ل</td>
+                                            <td class="profit-cell {{ $netProfit >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                                {{ number_format($netProfit, 3) }} د.ل
+                                            </td>
+                                            <td class="profit-cell {{ $profitMargin >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                                {{ number_format($profitMargin, 1) }}%
+                                            </td>
+                                            <td>{{ $invoice->invoice_date?->format('Y/m/d') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <i class="ti ti-chart-line"></i>
+                            <h5>لا توجد بيانات ربحية</h5>
+                            <p class="text-muted">لا توجد فواتير في الفترة المحددة</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -359,36 +482,29 @@
             </div>
         </div>
 
-        <!-- Invoice Status Distribution -->
+        <!-- Expense Categories -->
         <div class="col-lg-4">
             <div class="card report-card">
                 <div class="card-header">
-                    <h5>توزيع حالات الفواتير</h5>
+                    <h5>توزيع المصاريف</h5>
                 </div>
                 <div class="card-body">
-                    @if(isset($invoiceStats) && count($invoiceStats) > 0)
-                        @foreach($invoiceStats as $stat)
+                    @if(isset($expenseCategories) && count($expenseCategories) > 0)
+                        @foreach($expenseCategories as $expense)
                             <div class="progress-item">
                                 <div class="progress-label">
-                                    <span>
-                                        @switch($stat->status)
-                                            @case('unpaid') غير مدفوعة @break
-                                            @case('partial') مدفوعة جزئي @break
-                                            @case('cancelled') ملغية @break
-                                            @default {{ $stat->status }} @break
-                                        @endswitch
-                                    </span>
-                                    <span><strong>{{ $stat->count }}</strong></span>
+                                    <span>{{ $expense->description }}</span>
+                                    <span class="text-danger">{{ number_format($expense->total_amount, 0) }} د.ل</span>
                                 </div>
                                 <div class="progress">
-                                    <div class="progress-bar" style="width: {{ ($stat->count / $stats['total_invoices']) * 100 }}%"></div>
+                                    <div class="progress-bar bg-danger" style="width: {{ ($expense->total_amount / $totalExpenses) * 100 }}%"></div>
                                 </div>
                             </div>
                         @endforeach
                     @else
                         <div class="empty-state">
-                            <i class="ti ti-chart-pie-off"></i>
-                            <h6>لا توجد بيانات</h6>
+                            <i class="ti ti-receipt-off"></i>
+                            <h6>لا توجد مصاريف</h6>
                         </div>
                     @endif
                 </div>
@@ -412,6 +528,7 @@
                                         <th>الزبون</th>
                                         <th>عدد الفواتير</th>
                                         <th>إجمالي الإنفاق</th>
+                                        <th>الربح المحقق</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -427,6 +544,7 @@
                                             </td>
                                             <td><span class="badge bg-info">{{ $customer->invoice_count }}</span></td>
                                             <td class="amount-cell">{{ number_format($customer->total_spent, 3) }} د.ل</td>
+                                            <td class="profit-cell profit-positive">{{ number_format($customer->total_profit ?? 0, 3) }} د.ل</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -442,23 +560,26 @@
             </div>
         </div>
 
-        <!-- Monthly Revenue Trend -->
+        <!-- Monthly Profit Trend -->
         <div class="col-lg-6">
             <div class="card report-card">
                 <div class="card-header">
-                    <h5>الإيرادات الشهرية</h5>
+                    <h5>اتجاه الربحية الشهرية</h5>
                 </div>
                 <div class="card-body">
-                    @if(isset($monthlyRevenue) && count($monthlyRevenue) > 0)
+                    @if(isset($monthlyProfit) && count($monthlyProfit) > 0)
                         <div class="chart-container">
-                            @foreach($monthlyRevenue as $month)
+                            @foreach($monthlyProfit as $month)
                                 <div class="progress-item">
                                     <div class="progress-label">
                                         <span>{{ $month->month_name }}</span>
-                                        <span class="amount-cell">{{ number_format($month->revenue, 0) }} د.ل</span>
+                                        <span class="profit-cell {{ $month->net_profit >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                            {{ number_format($month->net_profit, 0) }} د.ل
+                                        </span>
                                     </div>
                                     <div class="progress">
-                                        <div class="progress-bar" style="width: {{ ($month->revenue / $monthlyRevenue->max('revenue')) * 100 }}%"></div>
+                                        <div class="progress-bar {{ $month->net_profit >= 0 ? 'bg-success' : 'bg-danger' }}" 
+                                             style="width: {{ abs($month->net_profit) > 0 ? (abs($month->net_profit) / $monthlyProfit->max('net_profit')) * 100 : 0 }}%"></div>
                                     </div>
                                 </div>
                             @endforeach
@@ -467,192 +588,6 @@
                         <div class="empty-state">
                             <i class="ti ti-chart-bar-off"></i>
                             <h6>لا توجد بيانات شهرية</h6>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Invoice Registration Report -->
-        <div class="col-12">
-            <div class="card report-card">
-                <div class="card-header">
-                    <h5>تقرير تسجيل الفواتير</h5>
-                </div>
-                <div class="card-body">
-                    @if(isset($invoiceRegistrations) && count($invoiceRegistrations) > 0)
-                        <div class="table-responsive">
-                            <table class="table table-elegant">
-                                <thead>
-                                    <tr>
-                                        <th>رقم الفاتورة</th>
-                                        <th>الزبون</th>
-                                        <th>تاريخ التسجيل</th>
-                                        <th>المبلغ</th>
-                                        <th>الحالة</th>
-                                        <th>المسجل بواسطة</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($invoiceRegistrations as $invoice)
-                                        <tr>
-                                            <td class="text-start">
-                                                <strong>{{ $invoice->invoice_number }}</strong>
-                                            </td>
-                                            <td class="text-start">{{ $invoice->customer_name }}</td>
-                                            <td>{{ $invoice->created_at }}</td>
-                                            <td class="amount-cell">{{ number_format($invoice->total, 3) }} د.ل</td>
-                                            <td>
-                                                <span class="badge 
-                                                    @switch($invoice->status)
-                                                        @case('unpaid') bg-warning @break
-                                                        @case('partial') bg-info @break
-                                                        @case('cancelled') bg-danger @break
-                                                        @default bg-secondary @break
-                                                    @endswitch
-                                                ">
-                                                    @switch($invoice->status)
-                                                        @case('unpaid') غير مدفوعة @break
-                                                        @case('partial') مدفوعة جزئي @break
-                                                        @case('cancelled') ملغية @break
-                                                        @default {{ $invoice->status }} @break
-                                                    @endswitch
-                                                </span>
-                                            </td>
-                                            <td class="text-start">{{ $invoice->user_name ?? 'غير محدد' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Registration Summary -->
-                        <div class="row mt-4">
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ count($invoiceRegistrations) }}</div>
-                                    <small class="text-muted">فاتورة مسجلة</small>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5 amount-cell">{{ number_format($invoiceRegistrations->sum('total'), 0) }} د.ل</div>
-                                    <small class="text-muted">إجمالي القيم</small>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ $invoiceRegistrations->where('status', 'unpaid')->count() }}</div>
-                                    <small class="text-muted">غير مدفوعة</small>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ $invoiceRegistrations->where('status', 'partial')->count() }}</div>
-                                    <small class="text-muted">مدفوعة جزئي</small>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="ti ti-file-off"></i>
-                            <h5>لا توجد فواتير مسجلة</h5>
-                            <p class="text-muted">لا توجد فواتير في الفترة المحددة</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Payments Registration Report -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card report-card">
-                <div class="card-header">
-                    <h5>تقرير تسجيل المدفوعات</h5>
-                </div>
-                <div class="card-body">
-                    @if(isset($paymentRegistrations) && count($paymentRegistrations) > 0)
-                        <div class="table-responsive">
-                            <table class="table table-elegant">
-                                <thead>
-                                    <tr>
-                                        <th>رقم الفاتورة</th>
-                                        <th>الزبون</th>
-                                        <th>مبلغ الدفعة</th>
-                                        <th>طريقة الدفع</th>
-                                        <th>تاريخ الدفع</th>
-                                        <th>تاريخ التسجيل</th>
-                                        <th>المسجل بواسطة</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($paymentRegistrations as $payment)
-                                        <tr>
-                                            <td class="text-start">
-                                                <strong>{{ $payment->invoice_number }}</strong>
-                                            </td>
-                                            <td class="text-start">{{ $payment->customer_name }}</td>
-                                            <td class="amount-cell">{{ number_format($payment->amount, 3) }} د.ل</td>
-                                            <td>
-                                                <span class="badge bg-info">{{ $payment->payment_method_name }}</span>
-                                            </td>
-                                            <td>{{ $payment->payment_date }}</td>
-                                            <td>{{ $payment->created_at }}</td>
-                                            <td class="text-start">{{ $payment->user_name ?? 'غير محدد' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Payment Summary -->
-                        <div class="row mt-4">
-                            <div class="col-md-2">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ count($paymentRegistrations) }}</div>
-                                    <small class="text-muted">دفعة مسجلة</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5 amount-cell">{{ number_format($paymentRegistrations->sum('amount'), 0) }} د.ل</div>
-                                    <small class="text-muted">إجمالي المدفوعات</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ $paymentRegistrations->where('payment_method', 'cash')->count() }}</div>
-                                    <small class="text-muted">نقدي</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ $paymentRegistrations->where('payment_method', 'bank_transfer')->count() }}</div>
-                                    <small class="text-muted">تحويل بنكي</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ $paymentRegistrations->where('payment_method', 'check')->count() }}</div>
-                                    <small class="text-muted">شيك</small>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <div class="fw-bold fs-5">{{ $paymentRegistrations->whereIn('payment_method', ['credit_card', 'other'])->count() }}</div>
-                                    <small class="text-muted">أخرى</small>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="ti ti-credit-card-off"></i>
-                            <h5>لا توجد مدفوعات مسجلة</h5>
-                            <p class="text-muted">لا توجد مدفوعات في الفترة المحددة</p>
                         </div>
                     @endif
                 </div>

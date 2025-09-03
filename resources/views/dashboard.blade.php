@@ -4,17 +4,254 @@
 
 @push('styles')
 <style>
-    .stats-kpi { display:flex; align-items:center; gap:14px; }
-    .stats-kpi .label { color:#6c757d; font-size:13px; }
-    .badge-round { border-radius:50px; padding:6px 10px; font-size:12px; }
-    .table-sm th, .table-sm td { padding:.4rem .6rem; }
+    .stats-kpi { 
+        display: flex; 
+        align-items: center; 
+        gap: 14px; 
+    }
+    .stats-kpi .label { 
+        color: #6c757d; 
+        font-size: 13px; 
+    }
+    .badge-round { 
+        border-radius: 50px; 
+        padding: 6px 10px; 
+        font-size: 12px; 
+    }
+    .table-sm th, .table-sm td { 
+        padding: .4rem .6rem; 
+    }
+    
+    /* Custom color scheme */
+    .welcome-banner {
+        background-color: #e8c9c0 !important;
+        border: none;
+    }
+    .welcome-banner .text-white {
+        color: #5a4037 !important;
+    }
+    .welcome-banner .btn-outline-light {
+        border-color: #b48b1e;
+        color: #b48b1e;
+        background: transparent;
+    }
+    .welcome-banner .btn-outline-light:hover {
+        background-color: #b48b1e;
+        border-color: #b48b1e;
+        color: white;
+    }
+    
+    /* Stats cards */
+    .stats-card {
+        border: none;
+        border-radius: 12px;
+        transition: transform 0.2s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stats-card.primary {
+        background-color: #e8c9c0;
+        color: #5a4037;
+    }
+    .stats-card.success {
+        background-color: #b48b1e;
+        color: white;
+    }
+    .stats-card.warning {
+        background-color: #e8c9c0;
+        color: #5a4037;
+    }
+    .stats-card.info {
+        background-color: #b48b1e;
+        color: white;
+    }
+    .stats-card.danger {
+        background-color: #e8c9c0;
+        color: #5a4037;
+    }
+    .stats-card.teal {
+        background-color: #b48b1e;
+        color: white;
+    }
+    .stats-card.purple {
+        background-color: #e8c9c0;
+        color: #5a4037;
+    }
+    
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    .stats-icon.primary {
+        background-color: rgba(90, 64, 55, 0.1);
+        color: #5a4037;
+    }
+    .stats-icon.success,
+    .stats-icon.info,
+    .stats-icon.teal {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    .stats-icon.warning,
+    .stats-icon.danger,
+    .stats-icon.purple {
+        background-color: rgba(90, 64, 55, 0.1);
+        color: #5a4037;
+    }
+    
+    .stats-number {
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+    .stats-label {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-bottom: 8px;
+    }
+    
+    /* Chart cards */
+    .chart-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .chart-header {
+        padding: 1rem 1.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+    .chart-header h5 {
+        color: #5a4037;
+        font-weight: 600;
+    }
+    
+    /* Alert styling */
+    .alert-warning {
+        background-color: #e8c9c0;
+        border-color: #b48b1e;
+        color: #5a4037;
+    }
+    .alert-warning strong {
+        color: #b48b1e;
+    }
+    .alert-warning a {
+        color: #b48b1e;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .alert-warning a:hover {
+        color: #8b6917;
+        text-decoration: underline;
+    }
+    
+    /* Badge improvements */
+    .bg-success {
+        background-color: #b48b1e !important;
+    }
+    .bg-warning {
+        background-color: #e8c9c0 !important;
+        color: #5a4037 !important;
+    }
+    .bg-danger {
+        background-color: #dc3545 !important;
+    }
+    .bg-secondary {
+        background-color: #6c757d !important;
+    }
+    
+    .text-success {
+        color: #b48b1e !important;
+    }
+    .text-warning {
+        color: #b48b1e !important;
+    }
+    .text-info {
+        color: #b48b1e !important;
+    }
+    .text-teal {
+        color: #b48b1e !important;
+    }
+    .text-primary {
+        color: #b48b1e !important;
+    }
+    
+    /* Table improvements */
+    .table thead th {
+        background-color: #f8f9fa;
+        color: #5a4037;
+        font-weight: 600;
+        border-bottom: 2px solid #e8c9c0;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(232, 201, 192, 0.1);
+    }
+    
+    /* Button improvements */
+    .btn-outline-secondary {
+        border-color: #b48b1e;
+        color: #b48b1e;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #b48b1e;
+        border-color: #b48b1e;
+        color: white;
+    }
+    
+    /* Links */
+    a {
+        color: #b48b1e;
+        text-decoration: none;
+    }
+    a:hover {
+        color: #8b6917;
+        text-decoration: underline;
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="card welcome-banner" style="background:#894b39!important;">
+        @if($todayInvoicesAlerts->count() || $tomorrowInvoicesAlerts->count())
+            <div class="alert alert-warning">
+                @if($todayInvoicesAlerts->count())
+                    <p class="mb-1">
+                        <strong>⚠️ فواتير اليوم ({{ now()->format('Y/m/d') }})</strong><br>
+                        @foreach($todayInvoicesAlerts as $inv)
+                            • <a href="{{ route('invoices.show', $inv->id) }}">{{ $inv->invoice_number }}</a>
+                            @if($inv->customer) - {{ $inv->customer->name }} @endif
+                            <br>
+                        @endforeach
+                    </p>
+                @endif
+
+                @if($tomorrowInvoicesAlerts->count())
+                    <p class="mb-0 mt-2">
+                        <strong>🔔 فواتير الغد ({{ now()->addDay()->format('Y/m/d') }})</strong><br>
+                        @foreach($tomorrowInvoicesAlerts as $inv)
+                            • <a href="{{ route('invoices.show', $inv->id) }}">{{ $inv->invoice_number }}</a>
+                            @if($inv->customer) - {{ $inv->customer->name }} @endif
+                            <br>
+                        @endforeach
+                    </p>
+                @endif
+            </div>
+        @endif
+    </div>
+    
+    <div class="col-md-12">
+        <div class="card welcome-banner">
             <div class="card-body">
                 <div class="row">
                     <div class="col-sm-6">
@@ -137,8 +374,6 @@
             </div>
         </div>
     </div>
-
- 
 
     {{-- Recent Invoices --}}
     <div class="col-lg-6 mb-3">

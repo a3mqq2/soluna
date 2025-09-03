@@ -71,6 +71,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+
+            $todayInvoices = Invoice::whereDate('invoice_date', Carbon::today())->get();
+            $tomorrowInvoices = Invoice::whereDate('invoice_date', Carbon::tomorrow())->get();
+
+
+
         return view('dashboard', [
             'customersCount'        => $customersCount,
             'invoicesCount'         => $invoicesCount,
@@ -86,6 +92,8 @@ class DashboardController extends Controller
             'topCustomers'          => $topCustomers,
             'today'                 => $today,
             'monthStart'            => $monthStart,
+            'todayInvoicesAlerts' => $todayInvoices,
+            'tomorrowInvoicesAlerts' => $tomorrowInvoices,
         ]);
     }
 }
