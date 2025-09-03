@@ -45,7 +45,7 @@ class InvoiceExpenseController extends Controller
     public function update(Request $request, Invoice $invoice, InvoiceExpense $expense)
     {
         // التأكد من أن المصروف ينتمي للفاتورة
-        if ($expense->invoice_id !== $invoice->id) {
+        if ($expense->invoice_id != $invoice->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'المصروف غير موجود في هذه الفاتورة'
@@ -68,7 +68,7 @@ class InvoiceExpenseController extends Controller
     public function destroy(Invoice $invoice, InvoiceExpense $expense)
     {
         // التأكد من أن المصروف ينتمي للفاتورة
-        if ($expense->invoice_id !== $invoice->id) {
+        if ($expense->invoice_id != $invoice->id) {
             return redirect()->back()->with('error', 'المصروف غير موجود في هذه الفاتورة');
         }
 

@@ -44,7 +44,7 @@
                     <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-edit me-1"></i>تعديل
                     </a>
-                    @if($user->id !== auth()->id())
+                    @if($user->id != auth()->id())
                         <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="d-inline">
                             @csrf
                             @method('POST')
@@ -205,7 +205,7 @@
                 <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
                     <i class="fas fa-edit me-1"></i>تعديل المستخدم
                 </a>
-                @if($user->id !== auth()->id())
+                @if($user->id != auth()->id())
                     <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline ms-2">
                         @csrf
                         @method('DELETE')

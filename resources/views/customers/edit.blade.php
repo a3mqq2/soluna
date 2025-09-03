@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkFormChanges() {
         for (let input of inputs) {
-            if (originalData[input.name] !== input.value) {
+            if (originalData[input.name] != input.value) {
                 return true;
             }
         }
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // تمييز الحقول المتغيرة
     inputs.forEach(input => {
         input.addEventListener('input', function() {
-            if (originalData[input.name] !== input.value) {
+            if (originalData[input.name] != input.value) {
                 input.classList.add('border-warning');
             } else {
                 input.classList.remove('border-warning');

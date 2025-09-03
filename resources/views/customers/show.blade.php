@@ -436,7 +436,7 @@
                                                         <i class="ti ti-eye"></i>
                                                     </a>
                                                     
-                                                    @if($invoice->status !== 'cancelled')
+                                                    @if($invoice->status != 'cancelled')
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-outline-success action-btn"
                                                                 onclick="showPaymentModal({{ $invoice->id }}, {{ $invoice->remaining_amount }})"

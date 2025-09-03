@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateBulkActions() {
         const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
         const hasSelection = checkedBoxes.length > 0;
-        const hasAction = bulkAction.value !== '';
+        const hasAction = bulkAction.value != '';
         
         bulkSubmit.disabled = !(hasSelection && hasAction);
         

@@ -432,7 +432,7 @@
             <div class="invoice-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6><i class="ti ti-credit-card me-2"></i>سجل المدفوعات</h6>
-                    @if($invoice->status !== 'cancelled')
+                    @if($invoice->status != 'cancelled')
                         <button class="btn btn-sm btn-primary btn-elegant no-print" 
                                 onclick="showPaymentModal({{ $invoice->id }}, {{ $invoice->remaining_amount }})">
                             <i class="ti ti-plus me-1"></i>
@@ -503,7 +503,7 @@
                                 <i class="ti ti-printer me-2"></i>طباعة الفاتورة
                             </a>
                             
-                            @if($invoice->status !== 'cancelled')
+                            @if($invoice->status != 'cancelled')
                                 <button class="btn btn-success btn-elegant" 
                                         onclick="showPaymentModal({{ $invoice->id }}, {{ $invoice->remaining_amount }})">
                                     <i class="ti ti-cash me-2"></i>إضافة دفعة

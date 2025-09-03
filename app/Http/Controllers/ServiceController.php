@@ -35,11 +35,11 @@ class ServiceController extends Controller
             $query->where('is_active', false);
         }
 
-        if ($filters['min_price'] !== null && $filters['min_price'] !== '') {
+        if ($filters['min_price'] != null && $filters['min_price'] != '') {
             $query->where('price', '>=', (float) $filters['min_price']);
         }
 
-        if ($filters['max_price'] !== null && $filters['max_price'] !== '') {
+        if ($filters['max_price'] != null && $filters['max_price'] != '') {
             $query->where('price', '<=', (float) $filters['max_price']);
         }
 

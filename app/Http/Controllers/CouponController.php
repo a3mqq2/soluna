@@ -43,7 +43,7 @@ class CouponController extends Controller
         }
 
         // Type filter
-        if ($filters['type'] !== 'all') {
+        if ($filters['type'] != 'all') {
             $query->where('type', $filters['type']);
         }
 
