@@ -77,13 +77,18 @@ class Invoice extends Model
     protected static function boot(): void
     {
         parent::boot();
-
+    
         static::creating(function ($invoice) {
             if (!$invoice->invoice_number) {
-                $invoice->invoice_number = 'INV-' . date('Y') . '-' . str_pad(static::count() + 1, 4, '0', STR_PAD_LEFT);
+                do {
+                    $number = 'INV-' . date('Y') . '-' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+                } while (static::where('invoice_number', $number)->exists());
+    
+                $invoice->invoice_number = $number;
             }
         });
     }
+    
 
     /**
      * Get all payments for this invoice.
