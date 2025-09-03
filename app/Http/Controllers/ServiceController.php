@@ -122,7 +122,7 @@ class ServiceController extends Controller
         $service->update($data);
 
         return redirect()
-            ->route('services.show', $service)
+            ->route('services.index')
             ->with('success', 'تم تحديث الخدمة بنجاح.');
     }
 
