@@ -91,11 +91,10 @@ class InvoiceController extends Controller
                 'customer_id' => $validated['customer_id'],
                 'invoice_date' => $validated['invoice_date'],
                 'discount' => $validated['discount'] ?? 0,
-                'paid_amount' => $validated['paid_amount'] ?? 0,
                 'notes' => $validated['notes'],
                 'user_id' => auth()->id() ?? 1,
             ]);
-
+        
             foreach ($validated['items'] as $item) {
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
@@ -104,15 +103,26 @@ class InvoiceController extends Controller
                     'unit_price' => $item['unit_price'],
                 ]);
             }
-
-
+        
+            if ($validated['paid_amount'] > 0) {
+                $invoice->addPayment([
+                    'amount' => $validated['paid_amount'],
+                    'method' => 'cash',
+                    'payment_date' => $validated['invoice_date'],
+                    'status' => 'completed',
+                    'notes' => 'دفعة بعد التحديث',
+                ]);
+            }
+            
+        
             if ($validated['coupon_id']) {
                 $coupon = Coupon::find($validated['coupon_id']);
                 $coupon->use(); 
             }
-            
+        
             $invoice->calculateTotals();
         });
+        
 
         return response()->json(['success' => true, 'message' => 'تم إنشاء الفاتورة بنجاح']);
     }

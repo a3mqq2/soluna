@@ -56,24 +56,18 @@ class Invoice extends Model
      */
     public function calculateTotals(): void
     {
-        // حساب إجمالي المبيعات
         $this->subtotal = $this->items->sum('total_price');
-        
-        // حساب إجمالي المصروفات
         $this->expenses_total = $this->expenses->sum('amount');
-        
-        // حساب الإجمالي بعد الخصم
         $this->total = $this->subtotal - $this->discount;
-        
-        // حساب صافي الربح (المبيعات - المصروفات - الخصم)
         $this->net_profit = $this->total - $this->expenses_total;
-        
-        // حساب المبلغ المتبقي
+    
+        $this->paid_amount = $this->getTotalPaidAttribute();
         $this->remaining_amount = $this->total - $this->paid_amount;
-        
+    
+        $this->updateStatus();
         $this->save();
     }
-
+    
     protected static function boot(): void
     {
         parent::boot();
