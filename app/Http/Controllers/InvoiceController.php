@@ -84,12 +84,14 @@ class InvoiceController extends Controller
             'coupon_id' => 'nullable|exists:coupons,id',
             'coupon_code' => 'nullable|string',
             'coupon_discount' => 'nullable|numeric|min:0',
+            'delivery_date' => "nullable|date",
         ]);
 
         DB::transaction(function () use ($validated) {
             $invoice = Invoice::create([
                 'customer_id' => $validated['customer_id'],
                 'invoice_date' => $validated['invoice_date'],
+                'delivery_date' => $validated['delivery_date'],
                 'discount' => $validated['discount'] ?? 0,
                 'notes' => $validated['notes'],
                 'user_id' => auth()->id() ?? 1,

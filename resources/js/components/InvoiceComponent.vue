@@ -6,7 +6,7 @@
           <div class="card elegant-card mb-4" style="z-index: 778 !important;">
             <div class="card-body p-4">
               <div class="row g-4">
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <label class="form-label text-dark fw-semibold mb-2">
                     تاريخ الفاتورة <span class="text-danger">*</span>
                   </label>
@@ -20,7 +20,22 @@
                     >
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                  <label class="form-label text-dark fw-semibold mb-2">
+                    تاريخ الاستلام <span class="text-danger">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="ti ti-calendar input-icon"></i>
+                    <input
+                      v-model="invoice.delivery_date"
+                      type="date"
+                      required
+                      class="form-control form-control-lg elegant-input"
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-4">
                   <label class="form-label text-dark fw-semibold mb-2">
                     الزبون <span class="text-danger">*</span>
                   </label>
@@ -485,6 +500,7 @@ export default {
     const invoice = ref({
       customer_id: '',
       invoice_date: new Date().toISOString().split('T')[0],
+      delivery_date: new Date().toISOString().split('T')[0],
       discount: 0,
       paid_amount: 0,
       notes: '',

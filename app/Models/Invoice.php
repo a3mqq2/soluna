@@ -21,7 +21,8 @@ class Invoice extends Model
         'paid_amount',
         'remaining_amount',
         'invoice_date',
-        'user_id'
+        'user_id',
+        'delivery_date',
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class Invoice extends Model
         'paid_amount' => 'decimal:2',
         'remaining_amount' => 'decimal:2',
         'invoice_date' => 'date',
+        'delivery_date' => 'date',
     ];
 
     public function customer(): BelongsTo

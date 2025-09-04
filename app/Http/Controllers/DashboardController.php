@@ -72,8 +72,8 @@ class DashboardController extends Controller
             ->get();
 
 
-            $todayInvoices = Invoice::whereDate('invoice_date', Carbon::today())->get();
-            $tomorrowInvoices = Invoice::whereDate('invoice_date', Carbon::tomorrow())->get();
+            $todayInvoices = Invoice::whereDate('delivery_date', Carbon::today())->get();
+            $tomorrowInvoices = Invoice::whereDate('delivery_date', Carbon::tomorrow())->get();
 
 
 

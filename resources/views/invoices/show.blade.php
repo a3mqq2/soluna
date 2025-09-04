@@ -314,6 +314,10 @@
                                     <td>{{ $invoice->invoice_date }}</td>
                                 </tr>
                                 <tr>
+                                    <th width="25%" style="background-color: #faf8f6; color: #b48b1e; font-weight: 600;">تاريخ الاستلام</th>
+                                    <td>{{ $invoice->delivery_date }}</td>
+                                </tr>
+                                <tr>
                                     <th width="25%" style="background-color: #faf8f6; color: #b48b1e; font-weight: 600;">حالة الفاتورة</th>
                                     <td>
                                         <span class="invoice-status-badge status-{{ $invoice->status }}">

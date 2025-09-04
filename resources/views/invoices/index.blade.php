@@ -447,6 +447,8 @@
                     <thead>
                         <tr>
                             <th>رقم الفاتورة</th>
+                            <th>تاريخ الفاتورة</th>
+                            <th>تاريخ الاستلام</th>
                             <th>الزبون</th>
                             <th>التاريخ</th>
                             <th>المبلغ الكلي</th>
@@ -464,6 +466,12 @@
                                     <span class="invoice-number-badge">
                                         {{ $invoice->invoice_number }}
                                     </span>
+                                </td>
+                                <td>
+                                    {{ $invoice->invoice_date }}
+                                </td>
+                                <td>
+                                    {{ $invoice->delivery_date }}
                                 </td>
                                 <td>
                                     <div class="customer-info">
