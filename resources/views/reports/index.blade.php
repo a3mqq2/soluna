@@ -290,19 +290,19 @@
         </form>
     </div>
 
-    <!-- Profitability Summary -->
+    <!-- Profitability Summary (اعتمادًا على الدفعات) -->
     @php
-        $totalRevenue = $stats['total_revenue'] ?? 0;
+        $totalPayments = $stats['total_payments'] ?? 0;
         $totalExpenses = $stats['total_expenses'] ?? 0;
-        $netProfit = $totalRevenue - $totalExpenses;
-        $profitMargin = $totalRevenue > 0 ? ($netProfit / $totalRevenue) * 100 : 0;
+        $netProfit     = $stats['net_profit'] ?? ($totalPayments - $totalExpenses);
+        $profitMargin  = $totalPayments > 0 ? ($netProfit / $totalPayments) * 100 : 0;
     @endphp
     
     <div class="profitability-summary">
         <div class="row text-center">
             <div class="col-md-3">
-                <h4 class="amount-cell">{{ number_format($totalRevenue, 3) }} د.ل</h4>
-                <small class="text-muted">إجمالي الإيرادات</small>
+                <h4 class="amount-cell">{{ number_format($totalPayments, 3) }} د.ل</h4>
+                <small class="text-muted">إجمالي الدفعات المُحصّلة</small>
             </div>
             <div class="col-md-3">
                 <h4 class="text-danger">{{ number_format($totalExpenses, 3) }} د.ل</h4>
@@ -343,8 +343,8 @@
                     <div class="stats-icon">
                         <i class="ti ti-currency-dollar"></i>
                     </div>
-                    <div class="stats-value">{{ number_format($totalRevenue, 0) }}</div>
-                    <div class="stats-label">إجمالي الإيرادات (د.ل)</div>
+                    <div class="stats-value">{{ number_format($totalPayments, 0) }}</div>
+                    <div class="stats-label">الدفعات المُحصّلة (د.ل)</div>
                 </div>
             </div>
         </div>
@@ -377,7 +377,7 @@
     </div>
 
     <div class="row">
-        <!-- Invoice Profitability Analysis -->
+        <!-- Invoice Profitability Analysis (دفعات - مصاريف) -->
         <div class="col-lg-12">
             <div class="card report-card">
                 <div class="card-header">
@@ -391,38 +391,31 @@
                                     <tr>
                                         <th>رقم الفاتورة</th>
                                         <th>الزبون</th>
-                                        <th>الإيرادات</th>
+                                        <th>الدفعات</th>
                                         <th>المصاريف</th>
-                                        <th>الخصم</th>
                                         <th>صافي الربح</th>
                                         <th>هامش الربح %</th>
-                                        <th>تاريخ الفاتورة</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($invoiceProfitability as $invoice)
+                                    @foreach($invoiceProfitability as $row)
                                         @php
-                                            $subtotal = $invoice->subtotal;
-                                            $expenses = $invoice->expenses_total;
-                                            $discount = $invoice->discount;
-                                            $netProfit = $subtotal - $expenses - $discount;
-                                            $profitMargin = $subtotal > 0 ? ($netProfit / $subtotal) * 100 : 0;
+                                            $paidSum      = (float) ($row->paid_sum ?? 0);
+                                            $expensesSum  = (float) ($row->expenses_sum ?? 0);
+                                            $netP         = (float) ($row->net_profit ?? ($paidSum - $expensesSum));
+                                            $margin       = $paidSum > 0 ? ($netP / $paidSum) * 100 : 0;
                                         @endphp
                                         <tr>
-                                            <td class="text-start">
-                                                <strong>{{ $invoice->invoice_number }}</strong>
+                                            <td class="text-start"><strong>{{ $row->invoice_number ?? '-' }}</strong></td>
+                                            <td class="text-start">{{ $row->customer_name ?? '-' }}</td>
+                                            <td class="amount-cell">{{ number_format($paidSum, 3) }} د.ل</td>
+                                            <td class="text-danger">{{ number_format($expensesSum, 3) }} د.ل</td>
+                                            <td class="profit-cell {{ $netP >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                                {{ number_format($netP, 3) }} د.ل
                                             </td>
-                                            <td class="text-start">{{ $invoice->customer->name ?? '-' }}</td>
-                                            <td class="amount-cell">{{ number_format($subtotal, 3) }} د.ل</td>
-                                            <td class="text-danger">{{ number_format($expenses, 3) }} د.ل</td>
-                                            <td class="text-warning">{{ number_format($discount, 3) }} د.ل</td>
-                                            <td class="profit-cell {{ $netProfit >= 0 ? 'profit-positive' : 'profit-negative' }}">
-                                                {{ number_format($netProfit, 3) }} د.ل
+                                            <td class="profit-cell {{ $margin >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                                {{ number_format($margin, 1) }}%
                                             </td>
-                                            <td class="profit-cell {{ $profitMargin >= 0 ? 'profit-positive' : 'profit-negative' }}">
-                                                {{ number_format($profitMargin, 1) }}%
-                                            </td>
-                                            <td>{{ $invoice->invoice_date?->format('Y/m/d') }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -489,6 +482,9 @@
                     <h5>توزيع المصاريف</h5>
                 </div>
                 <div class="card-body">
+                    @php
+                        $totalExpensesForPct = max(1, (float)$totalExpenses);
+                    @endphp
                     @if(isset($expenseCategories) && count($expenseCategories) > 0)
                         @foreach($expenseCategories as $expense)
                             <div class="progress-item">
@@ -497,7 +493,7 @@
                                     <span class="text-danger">{{ number_format($expense->total_amount, 0) }} د.ل</span>
                                 </div>
                                 <div class="progress">
-                                    <div class="progress-bar bg-danger" style="width: {{ ($expense->total_amount / $totalExpenses) * 100 }}%"></div>
+                                    <div class="progress-bar bg-danger" style="width: {{ ($expense->total_amount / $totalExpensesForPct) * 100 }}%"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -513,7 +509,7 @@
     </div>
 
     <div class="row">
-        <!-- Top Customers -->
+        <!-- Top Customers (اعتمادًا على الدفعات) -->
         <div class="col-lg-6">
             <div class="card report-card">
                 <div class="card-header">
@@ -527,7 +523,7 @@
                                     <tr>
                                         <th>الزبون</th>
                                         <th>عدد الفواتير</th>
-                                        <th>إجمالي الإنفاق</th>
+                                        <th>إجمالي الدفعات</th>
                                         <th>الربح المحقق</th>
                                     </tr>
                                 </thead>
@@ -537,14 +533,16 @@
                                             <td class="text-start">
                                                 <div class="d-flex align-items-center">
                                                     <div class="customer-avatar me-2" style="width: 30px; height: 30px; background: #e8c9c0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #b48b1e; font-weight: 700; font-size: 12px;">
-                                                        {{ substr($customer->customer_name, 0, 1) }}
+                                                        {{ mb_substr($customer->customer_name, 0, 1) }}
                                                     </div>
                                                     {{ $customer->customer_name }}
                                                 </div>
                                             </td>
                                             <td><span class="badge bg-info">{{ $customer->invoice_count }}</span></td>
-                                            <td class="amount-cell">{{ number_format($customer->total_spent, 3) }} د.ل</td>
-                                            <td class="profit-cell profit-positive">{{ number_format($customer->total_profit ?? 0, 3) }} د.ل</td>
+                                            <td class="amount-cell">{{ number_format($customer->total_paid ?? 0, 3) }} د.ل</td>
+                                            <td class="profit-cell {{ ($customer->total_profit ?? 0) >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                                {{ number_format($customer->total_profit ?? 0, 3) }} د.ل
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -560,7 +558,7 @@
             </div>
         </div>
 
-        <!-- Monthly Profit Trend -->
+        <!-- Monthly Profit Trend (دفعات - مصاريف) -->
         <div class="col-lg-6">
             <div class="card report-card">
                 <div class="card-header">
@@ -568,18 +566,22 @@
                 </div>
                 <div class="card-body">
                     @if(isset($monthlyProfit) && count($monthlyProfit) > 0)
+                        @php
+                            $maxAbs = max(1, collect($monthlyProfit)->map(fn($m) => abs((float)$m->net_profit))->max());
+                        @endphp
                         <div class="chart-container">
                             @foreach($monthlyProfit as $month)
+                                @php $np = (float)$month->net_profit; @endphp
                                 <div class="progress-item">
                                     <div class="progress-label">
                                         <span>{{ $month->month_name }}</span>
-                                        <span class="profit-cell {{ $month->net_profit >= 0 ? 'profit-positive' : 'profit-negative' }}">
-                                            {{ number_format($month->net_profit, 0) }} د.ل
+                                        <span class="profit-cell {{ $np >= 0 ? 'profit-positive' : 'profit-negative' }}">
+                                            {{ number_format($np, 0) }} د.ل
                                         </span>
                                     </div>
                                     <div class="progress">
-                                        <div class="progress-bar {{ $month->net_profit >= 0 ? 'bg-success' : 'bg-danger' }}" 
-                                             style="width: {{ abs($month->net_profit) > 0 ? (abs($month->net_profit) / $monthlyProfit->max('net_profit')) * 100 : 0 }}%"></div>
+                                        <div class="progress-bar {{ $np >= 0 ? 'bg-success' : 'bg-danger' }}" 
+                                             style="width: {{ (abs($np) / $maxAbs) * 100 }}%"></div>
                                     </div>
                                 </div>
                             @endforeach
@@ -600,13 +602,11 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit period form on date change
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(input => {
         input.addEventListener('change', function() {
-            // Add small delay to allow both dates to be selected
             setTimeout(() => {
-                document.querySelector('form').submit();
+                this.closest('form').submit();
             }, 100);
         });
     });
