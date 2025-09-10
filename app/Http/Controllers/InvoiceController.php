@@ -41,15 +41,38 @@ class InvoiceController extends Controller
             $query->whereDate('invoice_date', '<=', $request->get('date_to'));
         }
     
-        // ⏱️ ترتيب
-        $query->orderBy('invoice_date', 'desc');
+        // Handle different views
+        if ($request->get('view') === 'calendar') {
+            // For calendar view, get all invoices and group by date
+            $query->orderBy('invoice_date', 'asc');
+            $allInvoices = $query->get();
+            
+            // Group invoices by date for calendar
+            $invoicesGrouped = $allInvoices->groupBy(function($invoice) {
+                return \Carbon\Carbon::parse($invoice->invoice_date)->format('Y-m-d');
+            })->map(function($group) {
+                return $group->map(function($invoice) {
+                    return [
+                        'id' => $invoice->id,
+                        'invoice_number' => $invoice->invoice_number,
+                        'customer_name' => $invoice->customer->name,
+                        'total' => $invoice->total,
+                        'status' => $invoice->status
+                    ];
+                })->toArray();
+            })->toArray();
+            
+            $invoices = $allInvoices; // For compatibility
+            $calendarData = $invoicesGrouped;
+        } else {
+            // For table view, use pagination
+            $query->orderBy('invoice_date', 'desc');
+            $invoices = $query->paginate(10);
+            $calendarData = [];
+        }
     
-        // 📑 ترقيم الصفحات
-        $invoices = $query->paginate(10);
-    
-        return view('invoices.index', compact('invoices'));
+        return view('invoices.index', compact('invoices', 'calendarData'));
     }
-    
 
     public function create()
     {

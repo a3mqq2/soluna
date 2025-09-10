@@ -39,14 +39,12 @@
         border-color: #b48b1e;
     }
 
-
     .status-paid { 
         background-color: #379627; 
         color: #ffffff; 
         border-color: #10691f;
     }
 
-    
     .amount-cell { 
         font-family: 'Courier New', monospace; 
         font-weight: 600; 
@@ -105,7 +103,194 @@
         color: white;
         padding: 20px 24px;
     }
+
+    /* View Toggle Buttons */
+    .view-toggle {
+        display: flex;
+        gap: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e8c9c0;
+    }
     
+    .view-toggle .btn {
+        border: none;
+        border-radius: 0;
+        padding: 8px 16px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .view-toggle .btn.active {
+        background-color: #b48b1e;
+        color: white;
+    }
+    
+    .view-toggle .btn:not(.active) {
+        background-color: white;
+        color: #b48b1e;
+    }
+    
+    .view-toggle .btn:not(.active):hover {
+        background-color: #faf8f6;
+    }
+
+    /* Calendar Styles */
+    .calendar-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(180, 139, 30, 0.1);
+        overflow: hidden;
+    }
+
+    .calendar-header {
+        background: linear-gradient(135deg, #b48b1e 0%, #8a6817 100%);
+        color: white;
+        padding: 20px 24px;
+    }
+
+    .calendar-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: #faf8f6;
+        border-bottom: 1px solid #e8c9c0;
+    }
+
+    .calendar-nav button {
+        background: #b48b1e;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .calendar-nav button:hover {
+        background: #8a6817;
+        transform: translateY(-1px);
+    }
+
+    .calendar-nav h4 {
+        margin: 0;
+        color: #5a5a5a;
+        font-weight: 700;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background-color: #e8c9c0;
+        padding: 1px;
+    }
+
+    .calendar-day-header {
+        background-color: #b48b1e;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .calendar-day {
+        background-color: white;
+        min-height: 120px;
+        padding: 8px;
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+    .calendar-day:hover {
+        background-color: #faf8f6;
+    }
+
+    .calendar-day.other-month {
+        background-color: #f8f9fa;
+        color: #adb5bd;
+    }
+
+    .calendar-day.today {
+        background-color: #fff3cd;
+        border: 2px solid #b48b1e;
+    }
+
+    .day-number {
+        font-weight: 700;
+        font-size: 14px;
+        color: #5a5a5a;
+        margin-bottom: 5px;
+    }
+
+    .calendar-day.other-month .day-number {
+        color: #adb5bd;
+    }
+
+    .calendar-day.today .day-number {
+        color: #b48b1e;
+    }
+
+    .day-invoices {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .invoice-item {
+        background: #e8c9c0;
+        color: #b48b1e;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .invoice-item:hover {
+        background: #b48b1e;
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .invoice-item.status-paid {
+        background: #379627;
+        color: white;
+    }
+
+    .invoice-item.status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .invoice-item.status-partial {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .invoice-item.status-unpaid {
+        background: #e8c9c0;
+        color: #694c00;
+    }
+
+    .more-invoices {
+        background: #6c757d;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 9px;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 2px;
+    }
+
     .table-elegant {
         margin-bottom: 0;
         border-collapse: separate;
@@ -325,6 +510,28 @@
             align-items: flex-start;
             gap: 8px;
         }
+
+        .calendar-day {
+            min-height: 80px;
+            padding: 4px;
+        }
+
+        .day-number {
+            font-size: 12px;
+        }
+
+        .invoice-item {
+            font-size: 8px;
+            padding: 1px 4px;
+        }
+
+        .view-toggle {
+            width: 100%;
+        }
+
+        .view-toggle .btn {
+            flex: 1;
+        }
     }
 </style>
 @endpush
@@ -344,6 +551,9 @@
                 <div class="collapse" id="filterSection">
                     <hr class="my-3" style="border-color: #e8c9c0;">
                     <form method="GET" id="filterForm" class="row g-3">
+                        <!-- Hidden input to preserve view mode -->
+                        <input type="hidden" name="view" value="{{ request('view', 'table') }}">
+                        
                         <!-- Search -->
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">البحث</label>
@@ -424,245 +634,273 @@
         </div>
     </div>
 
-    <!-- Main Table -->
-    <div class="card main-table-card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-1 fw-bold text-white">
-                        <i class="ti ti-receipt me-2"></i>
-                        قائمة المناسبات
-                    </h5>
-                    <small class="opacity-75">عرض {{ $invoices->count() }} من أصل {{ $invoices->total() }} فاتورة</small>
+    <!-- Main Content Card -->
+    @if(request('view') === 'calendar')
+        <!-- Calendar View -->
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1 fw-bold text-white">
+                            <i class="ti ti-calendar me-2"></i>
+                            عرض التقويم - المناسبات
+                        </h5>
+                        <small class="opacity-75">عرض الفواتير حسب التاريخ</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <div class="view-toggle">
+                            <a href="{{ request()->fullUrlWithQuery(['view' => 'table']) }}" class="btn">
+                                <i class="ti ti-table"></i> جدول
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['view' => 'calendar']) }}" class="btn active">
+                                <i class="ti ti-calendar"></i> تقويم
+                            </a>
+                        </div>
+                        <a href="{{ route('invoices.create') }}" class="btn btn-light">
+                            <i class="ti ti-plus"></i> إنشاء فاتورة جديدة
+                        </a>
+                    </div>
                 </div>
-                <a href="{{ route('invoices.create') }}" class="btn btn-light">
-                    <i class="ti ti-plus"></i> إنشاء فاتورة جديدة
-                </a>
+            </div>
+
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)">
+                    <i class="ti ti-chevron-right"></i> الشهر السابق
+                </button>
+                <h4 id="currentMonth"></h4>
+                <button onclick="changeMonth(1)">
+                    الشهر التالي <i class="ti ti-chevron-left"></i>
+                </button>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar will be populated by JavaScript -->
             </div>
         </div>
-
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-elegant">
-                    <thead>
-                        <tr>
-                            <th>رقم الفاتورة</th>
-                            <th>تاريخ الفاتورة</th>
-                            <th>تاريخ الاستلام</th>
-                            <th>الزبون</th>
-                            <th>التاريخ</th>
-                            <th>المبلغ الكلي</th>
-                            <th>المبلغ المدفوع</th>
-                            <th>المبلغ المتبقي</th>
-                            <th> صافي الربح </th>
-                            <th>الحالة</th>
-                            <th width="220" class="text-center">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($invoices as $invoice)
-                            <tr>
-                                <td>
-                                    <span class="invoice-number-badge">
-                                        {{ $invoice->invoice_number }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {{ $invoice->invoice_date }}
-                                </td>
-                                <td>
-                                    {{ $invoice->delivery_date }}
-                                </td>
-                                <td>
-                                    <div class="customer-info">
-                                        <div class="customer-avatar">
-                                            {{ mb_substr($invoice->customer->name, 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold" style="color: #5a5a5a;">{{ $invoice->customer->name }}</div>
-                                            <small class="text-muted">{{ $invoice->customer->phone }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-muted">{{ $invoice->invoice_date }}</td>
-                                <td class="amount-cell" style="color: #b48b1e;">{{ number_format($invoice->total, 2) }} د.ل</td>
-                                <td class="amount-cell text-success">{{ number_format($invoice->paid_amount, 2) }} د.ل</td>
-                                <td class="amount-cell text-warning">{{ number_format($invoice->remaining_amount, 2) }} د.ل</td>
-                                <td class="amount-cell" style="color: #379627;">{{ number_format($invoice->net_profit, 2) }} د.ل</td>
-                                <td>
-                                    <span class="invoice-status-badge status-{{ $invoice->status }}">
-                                        @switch($invoice->status)
-                                            @case('cancelled') ملغية @break
-                                            @case('partial') مدفوعة جزئي @break
-                                            @case('unpaid') غير مدفوعة @break
-                                            @case('paid')  مدفوعة @break
-                                            @default {{ $invoice->status }} @break
-                                        @endswitch
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="action-buttons d-flex gap-1 justify-content-center">
-                                        <a href="{{ route('invoices.show', $invoice) }}" 
-                                           class="btn btn-outline-info btn-sm" title="عرض">
-                                            <i class="ti ti-eye"></i>
-                                        </a>
-            
-                                        <a href="javascript:void(0)"
-                                           class="btn btn-outline-primary btn-sm"
-                                           title="تعديل"
-                                           onclick="openEditModal({{ $invoice->id }}, `{{ $invoice->invoice_number }}`)">
-                                            <i class="ti ti-edit"></i>
-                                        </a>
-                                        
-                                        @if($invoice->status != 'cancelled')
-                                            <button type="button" 
-                                                    class="btn btn-outline-success btn-sm"
-                                                    onclick="showPaymentModal({{ $invoice->id }}, {{ $invoice->remaining_amount }})"
-                                                    title="إضافة دفعة">
-                                                <i class="ti ti-cash"></i>
-                                            </button>
-                                        @endif
-                                        
-                                        <a href="{{ route('invoices.show', $invoice) }}?print=1" 
-                                           class="btn btn-outline-secondary btn-sm" 
-                                           target="_blank" 
-                                           title="طباعة">
-                                            <i class="ti ti-printer"></i>
-                                        </a>
-            
-                                        <button type="button"
-                                                class="btn btn-outline-danger btn-sm"
-                                                title="حذف"
-                                                onclick="openDeleteModal({{ $invoice->id }}, `{{ $invoice->invoice_number }}`)">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <i class="ti ti-file-off"></i>
-                                        <h5 class="fw-bold">لا توجد فواتير</h5>
-                                        <p class="text-muted mb-3">لم يتم العثور على فواتير تطابق معايير البحث</p>
-                                        <a href="{{ route('invoices.create') }}" class="btn btn-primary">
-                                            <i class="ti ti-plus"></i> إنشاء فاتورة جديدة
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+    @else
+        <!-- Table View -->
+        <div class="card main-table-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1 fw-bold text-white">
+                            <i class="ti ti-receipt me-2"></i>
+                            قائمة المناسبات
+                        </h5>
+                        <small class="opacity-75">عرض {{ $invoices->count() }} من أصل {{ $invoices->total() }} فاتورة</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <div class="view-toggle">
+                            <a href="{{ request()->fullUrlWithQuery(['view' => 'table']) }}" class="btn active">
+                                <i class="ti ti-table"></i> جدول
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['view' => 'calendar']) }}" class="btn">
+                                <i class="ti ti-calendar"></i> تقويم
+                            </a>
+                        </div>
+                        <a href="{{ route('invoices.create') }}" class="btn btn-light">
+                            <i class="ti ti-plus"></i> إنشاء فاتورة جديدة
+                        </a>
+                    </div>
+                </div>
             </div>
-            
-            {{-- Edit Confirm Modal (ينقلك لمحرر التعديل الكامل) --}}
-            <div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header" style="background:#b48b1e;">
-                    <h5 class="modal-title text-white" id="editInvoiceModalLabel">
-                        <i class="ti ti-edit me-1"></i> تعديل الفاتورة
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p class="mb-1">هل تريد فتح صفحة تعديل الفاتورة التالية؟</p>
-                    <div class="border rounded p-2 bg-light">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-secondary" id="edit-invoice-number">--</span>
-                            <small class="text-muted">سيتم فتح المحرر الكامل لتعديل العناصر والخصومات والمدفوعات.</small>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-elegant">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>تاريخ الفاتورة</th>
+                                <th>تاريخ الاستلام</th>
+                                <th>الزبون</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ الكلي</th>
+                                <th>المبلغ المدفوع</th>
+                                <th>المبلغ المتبقي</th>
+                                <th> صافي الربح </th>
+                                <th>الحالة</th>
+                                <th width="220" class="text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($invoices as $invoice)
+                                <tr>
+                                    <td>
+                                        <span class="invoice-number-badge">
+                                            {{ $invoice->invoice_number }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{ $invoice->invoice_date }}
+                                    </td>
+                                    <td>
+                                        {{ $invoice->delivery_date }}
+                                    </td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <div class="customer-avatar">
+                                                {{ mb_substr($invoice->customer->name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold" style="color: #5a5a5a;">{{ $invoice->customer->name }}</div>
+                                                <small class="text-muted">{{ $invoice->customer->phone }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted">{{ $invoice->invoice_date }}</td>
+                                    <td class="amount-cell" style="color: #b48b1e;">{{ number_format($invoice->total, 2) }} د.ل</td>
+                                    <td class="amount-cell text-success">{{ number_format($invoice->paid_amount, 2) }} د.ل</td>
+                                    <td class="amount-cell text-warning">{{ number_format($invoice->remaining_amount, 2) }} د.ل</td>
+                                    <td class="amount-cell" style="color: #379627;">{{ number_format($invoice->net_profit, 2) }} د.ل</td>
+                                    <td>
+                                        <span class="invoice-status-badge status-{{ $invoice->status }}">
+                                            @switch($invoice->status)
+                                                @case('cancelled') ملغية @break
+                                                @case('partial') مدفوعة جزئي @break
+                                                @case('unpaid') غير مدفوعة @break
+                                                @case('paid')  مدفوعة @break
+                                                @default {{ $invoice->status }} @break
+                                            @endswitch
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="action-buttons d-flex gap-1 justify-content-center">
+                                            <a href="{{ route('invoices.show', $invoice) }}" 
+                                               class="btn btn-outline-info btn-sm" title="عرض">
+                                                <i class="ti ti-eye"></i>
+                                            </a>
+                
+                                            <a href="javascript:void(0)"
+                                               class="btn btn-outline-primary btn-sm"
+                                               title="تعديل"
+                                               onclick="openEditModal({{ $invoice->id }}, `{{ $invoice->invoice_number }}`)">
+                                                <i class="ti ti-edit"></i>
+                                            </a>
+                                            
+                                            @if($invoice->status != 'cancelled')
+                                                <button type="button" 
+                                                        class="btn btn-outline-success btn-sm"
+                                                        onclick="showPaymentModal({{ $invoice->id }}, {{ $invoice->remaining_amount }})"
+                                                        title="إضافة دفعة">
+                                                    <i class="ti ti-cash"></i>
+                                                </button>
+                                            @endif
+                                            
+                                            <a href="{{ route('invoices.show', $invoice) }}?print=1" 
+                                               class="btn btn-outline-secondary btn-sm" 
+                                               target="_blank" 
+                                               title="طباعة">
+                                                <i class="ti ti-printer"></i>
+                                            </a>
+                
+                                            <button type="button"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    title="حذف"
+                                                    onclick="openDeleteModal({{ $invoice->id }}, `{{ $invoice->invoice_number }}`)">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="11">
+                                        <div class="empty-state">
+                                            <i class="ti ti-file-off"></i>
+                                            <h5 class="fw-bold">لا توجد فواتير</h5>
+                                            <p class="text-muted mb-3">لم يتم العثور على فواتير تطابق معايير البحث</p>
+                                            <a href="{{ route('invoices.create') }}" class="btn btn-primary">
+                                                <i class="ti ti-plus"></i> إنشاء فاتورة جديدة
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if($invoices->hasPages())
+                    <div class="p-4 border-top" style="background-color: #faf8f6;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                عرض {{ $invoices->firstItem() }} إلى {{ $invoices->lastItem() }}
+                                من أصل {{ $invoices->total() }} فاتورة
+                            </div>
+                            <div>
+                                {{ $invoices->appends(request()->input())->links() }}
+                            </div>
                         </div>
                     </div>
-                  </div>
-                  <div class="modal-footer">
-                    <a href="#" id="goToEditLink" class="btn btn-primary">
-                        <i class="ti ti-external-link"></i> فتح صفحة التعديل
-                    </a>
+                @endif
+            </div>
+        </div>
+    @endif
+</div>
+
+<!-- Modals -->
+<!-- Edit Confirm Modal -->
+<div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#b48b1e;">
+                <h5 class="modal-title text-white" id="editInvoiceModalLabel">
+                    <i class="ti ti-edit me-1"></i> تعديل الفاتورة
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">هل تريد فتح صفحة تعديل الفاتورة التالية؟</p>
+                <div class="border rounded p-2 bg-light">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary" id="edit-invoice-number">--</span>
+                        <small class="text-muted">سيتم فتح المحرر الكامل لتعديل العناصر والخصومات والمدفوعات.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="goToEditLink" class="btn btn-primary">
+                    <i class="ti ti-external-link"></i> فتح صفحة التعديل
+                </a>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteInvoiceModal" tabindex="-1" aria-labelledby="deleteInvoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" id="deleteInvoiceForm">
+            @csrf
+            @method('DELETE')
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteInvoiceModalLabel">
+                        <i class="ti ti-alert-triangle me-1"></i> تأكيد حذف الفاتورة
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1">هل أنت متأكد من حذف الفاتورة التالية؟ لا يمكن التراجع عن هذا الإجراء.</p>
+                    <div class="border rounded p-2 bg-light">
+                        <span class="badge bg-secondary" id="delete-invoice-number">--</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="ti ti-trash"></i> نعم، حذف
+                    </button>
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                         إلغاء
                     </button>
-                  </div>
                 </div>
-              </div>
             </div>
-            
-            <div class="modal fade" id="deleteInvoiceModal" tabindex="-1" aria-labelledby="deleteInvoiceModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <form method="POST" id="deleteInvoiceForm">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-content">
-                      <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="deleteInvoiceModalLabel">
-                            <i class="ti ti-alert-triangle me-1"></i> تأكيد حذف الفاتورة
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-                      </div>
-                      <div class="modal-body">
-                        <p class="mb-1">هل أنت متأكد من حذف الفاتورة التالية؟ لا يمكن التراجع عن هذا الإجراء.</p>
-                        <div class="border rounded p-2 bg-light">
-                            <span class="badge bg-secondary" id="delete-invoice-number">--</span>
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="ti ti-trash"></i> نعم، حذف
-                        </button>
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            إلغاء
-                        </button>
-                      </div>
-                    </div>
-                </form>
-              </div>
-            </div>
-            
-            @push('scripts')
-            <script>
-            (function () {
-                const baseInvoicesUrl = "{{ url('invoices') }}";
-            
-                window.openEditModal = function (id, number) {
-                    const link = document.getElementById('goToEditLink');
-                    const badge = document.getElementById('edit-invoice-number');
-                    badge.textContent = number || ('#' + id);
-                    link.setAttribute('href', `${baseInvoicesUrl}/${id}/edit`);
-                    const modalEl = document.getElementById('editInvoiceModal');
-                    const m = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
-                    m ? m.show() : modalEl.classList.add('show');
-                };
-            
-                window.openDeleteModal = function (id, number) {
-                    const form = document.getElementById('deleteInvoiceForm');
-                    const badge = document.getElementById('delete-invoice-number');
-                    badge.textContent = number || ('#' + id);
-                    form.setAttribute('action', `${baseInvoicesUrl}/${id}`);
-                    const modalEl = document.getElementById('deleteInvoiceModal');
-                    const m = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
-                    m ? m.show() : modalEl.classList.add('show');
-                };
-            })();
-            </script>
-            @endpush
-            
-
-            <!-- Pagination -->
-            @if($invoices->hasPages())
-                <div class="p-4 border-top" style="background-color: #faf8f6;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-muted">
-                            عرض {{ $invoices->firstItem() }} إلى {{ $invoices->lastItem() }}
-                            من أصل {{ $invoices->total() }} فاتورة
-                        </div>
-                        <div>
-                            {{ $invoices->appends(request()->input())->links() }}
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </div>
+        </form>
     </div>
 </div>
 
@@ -738,6 +976,24 @@
     </div>
 </div>
 
+<!-- Invoice Detail Modal (for calendar view) -->
+<div class="modal fade" id="invoiceDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #b48b1e; color: white;">
+                <h5 class="modal-title">
+                    <i class="ti ti-receipt me-2"></i>
+                    تفاصيل الفاتورة
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="invoiceDetailContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 #paymentModal .form-select, 
 #paymentModal .form-control {
@@ -795,7 +1051,136 @@
 }
 </style>
 
+@php
+    $calendarInvoices = $invoices->map(function($invoice) {
+        return [
+            'id' => $invoice->id,
+            'invoice_number' => $invoice->invoice_number,
+            'customer_name' => $invoice->customer->name,
+            'total' => $invoice->total,
+            'status' => $invoice->status,
+            'invoice_date' => \Carbon\Carbon::parse($invoice->delivery_date)->format('Y-m-d'),
+        ];
+    })->groupBy('invoice_date');
+@endphp
+
+
 <script>
+let currentDate = new Date();
+let invoicesData = @json($calendarInvoices);
+
+const monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+];
+
+const dayNames = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+
+function renderCalendar() {
+    if (document.getElementById('calendarGrid') === null) return;
+    
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Update month display
+    document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const numDays = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    // Get today's date
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+    
+    // Clear calendar grid
+    const calendarGrid = document.getElementById('calendarGrid');
+    calendarGrid.innerHTML = '';
+    
+    // Add day headers
+    dayNames.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+    });
+    
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startingDayOfWeek; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day other-month';
+        calendarGrid.appendChild(emptyDay);
+    }
+    
+    // Add days of the month
+    for (let day = 1; day <= numDays; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        
+        const dayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        // Check if it's today
+        if (dayString === todayString) {
+            dayElement.classList.add('today');
+        }
+        
+        // Add day number
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = day;
+        dayElement.appendChild(dayNumber);
+        
+        // Add invoices for this day
+        const dayInvoicesContainer = document.createElement('div');
+        dayInvoicesContainer.className = 'day-invoices';
+        
+        if (invoicesData[dayString]) {
+            const dayInvoices = invoicesData[dayString];
+            const maxVisible = 3;
+            
+            dayInvoices.slice(0, maxVisible).forEach(invoice => {
+                const invoiceElement = document.createElement('div');
+                invoiceElement.className = `invoice-item status-${invoice.status}`;
+                invoiceElement.textContent = invoice.invoice_number;
+                invoiceElement.title = `${invoice.customer_name} - ${invoice.total} د.ل`;
+                invoiceElement.onclick = () => showInvoiceDetail(invoice.id);
+                dayInvoicesContainer.appendChild(invoiceElement);
+            });
+            
+            if (dayInvoices.length > maxVisible) {
+                const moreElement = document.createElement('div');
+                moreElement.className = 'more-invoices';
+                moreElement.textContent = `+${dayInvoices.length - maxVisible} أخرى`;
+                dayInvoicesContainer.appendChild(moreElement);
+            }
+        }
+        
+        dayElement.appendChild(dayInvoicesContainer);
+        calendarGrid.appendChild(dayElement);
+    }
+}
+
+function changeMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    renderCalendar();
+}
+
+function showInvoiceDetail(invoiceId) {
+    // This would typically make an AJAX request to get invoice details
+    // For now, we'll redirect to the invoice show page
+    window.location.href = `/invoices/${invoiceId}`;
+}
+
+// Initialize calendar on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.search.includes('view=calendar')) {
+        renderCalendar();
+    }
+});
+
+// Table view functionality
 function showPaymentModal(invoiceId, remainingAmount) {
     // Reset form
     document.getElementById('paymentForm').reset();
@@ -907,37 +1292,6 @@ document.getElementById('paymentModal').addEventListener('hidden.bs.modal', func
     submitBtn.innerHTML = '<i class="ti ti-check"></i> حفظ الدفعة';
     submitBtn.disabled = false;
 });
-</script>
-@endsection
-
-@push('scripts')
-<script>
-function showPaymentModal(invoiceId, remainingAmount) {
-    document.getElementById('remainingAmount').value = remainingAmount.toFixed(2) + ' د.ل';
-    document.getElementById('paymentForm').action = `/invoices/${invoiceId}/payment`;
-    
-    const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    modal.show();
-}
-
-document.getElementById('paymentForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const amount = parseFloat(formData.get('amount'));
-    const remainingAmount = parseFloat(document.getElementById('remainingAmount').value);
-    
-    if (amount > remainingAmount) {
-        if (window.toastr) {
-            toastr.error('لا يمكن أن يكون مبلغ الدفعة أكبر من المبلغ المتبقي');
-        } else {
-            alert('لا يمكن أن يكون مبلغ الدفعة أكبر من المبلغ المتبقي');
-        }
-        return;
-    }
-    
-    this.submit();
-});
 
 function removeFilter(filterName) {
     const url = new URL(window.location.href);
@@ -948,5 +1302,30 @@ function removeFilter(filterName) {
     }
     window.location.href = url.toString();
 }
+
+// Edit and Delete Modal Functions
+(function () {
+    const baseInvoicesUrl = "{{ url('invoices') }}";
+
+    window.openEditModal = function (id, number) {
+        const link = document.getElementById('goToEditLink');
+        const badge = document.getElementById('edit-invoice-number');
+        badge.textContent = number || ('#' + id);
+        link.setAttribute('href', `${baseInvoicesUrl}/${id}/edit`);
+        const modalEl = document.getElementById('editInvoiceModal');
+        const m = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
+        m ? m.show() : modalEl.classList.add('show');
+    };
+
+    window.openDeleteModal = function (id, number) {
+        const form = document.getElementById('deleteInvoiceForm');
+        const badge = document.getElementById('delete-invoice-number');
+        badge.textContent = number || ('#' + id);
+        form.setAttribute('action', `${baseInvoicesUrl}/${id}`);
+        const modalEl = document.getElementById('deleteInvoiceModal');
+        const m = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
+        m ? m.show() : modalEl.classList.add('show');
+    };
+})();
 </script>
-@endpush
+@endsection
