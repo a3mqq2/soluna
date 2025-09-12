@@ -135,7 +135,6 @@ class InvoiceController extends Controller
                     'method' => 'cash',
                     'payment_date' => $validated['invoice_date'],
                     'status' => 'completed',
-                    'notes' => 'دفعة بعد التحديث',
                 ]);
             }
             

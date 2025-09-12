@@ -9,9 +9,11 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\TreasuryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ShippingTypeController;
 use App\Http\Controllers\DeliveryPriceController;
 use App\Http\Controllers\InvoiceExpenseController;
@@ -63,6 +65,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('customers/bulk-action', [CustomerController::class, 'bulkAction'])
     ->name('customers.bulk-action');
+    
+
+    Route::get('/treasury', [TreasuryController::class, 'index'])->name('treasury.index');
+
+
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+
+
     
 
 

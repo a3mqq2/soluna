@@ -28,6 +28,26 @@
 
 
 
+<li class="pc-item pc-hasmenu">
+  <a href="#!" class="pc-link">
+    <span class="pc-micon">
+      <i class="fa fa-cash-register"></i>
+    </span>
+    <span class="pc-mtext">الخزينة المالية</span>
+    <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+  </a>
+  <ul class="pc-submenu">
+    <li class="pc-item">
+      <a class="pc-link" href="{{ route('transactions.create') }}">إضافة معاملة جديدة</a>
+    </li>
+    <li class="pc-item">
+      <a class="pc-link" href="{{ route('transactions.index') }}">قائمة المعاملات</a>
+    </li>
+  </ul>
+</li>
+
+
+
  <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -84,6 +104,7 @@
     </li>
   </ul>
 </li>
+
 
 
 
