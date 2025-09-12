@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
+use App\Models\Transaction;
+use App\Models\Treasury;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -21,22 +23,11 @@ class InvoicePaymentController extends Controller
             'reference_number' => ['nullable', 'string', 'max:255'],
             'payment_date' => ['nullable', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:1000'],
-        ], [
-            'amount.required' => 'مبلغ الدفعة مطلوب',
-            'amount.numeric' => 'مبلغ الدفعة يجب أن يكون رقماً',
-            'amount.min' => 'مبلغ الدفعة يجب أن يكون أكبر من صفر',
-            'amount.max' => 'مبلغ الدفعة لا يمكن أن يكون أكبر من المبلغ المتبقي',
-            'payment_method.required' => 'طريقة الدفع مطلوبة',
-            'payment_method.in' => 'طريقة الدفع غير صالحة',
-            'payment_date.date' => 'تاريخ الدفع غير صالح',
-            'payment_date.before_or_equal' => 'تاريخ الدفع لا يمكن أن يكون في المستقبل',
-            'reference_number.max' => 'رقم المرجع طويل جداً',
-            'notes.max' => 'الملاحظات طويلة جداً',
         ]);
 
         try {
             $payment = null;
-            
+
             DB::transaction(function () use ($request, $invoice, &$payment) {
                 $payment = $invoice->addPayment([
                     'amount' => $request->amount,
@@ -46,9 +37,21 @@ class InvoicePaymentController extends Controller
                     'notes' => $request->notes,
                     'status' => 'completed',
                 ]);
+
+                // 📌 تحديث الخزنة
+                $treasury = Treasury::first();
+                if ($treasury) {
+                    Transaction::create([
+                        'treasury_id' => $treasury->id,
+                        'type' => 'deposit',
+                        'amount' => $payment->amount,
+                        'description' => "دفعة من فاتورة #{$invoice->invoice_number}",
+                        'invoice_id' => $invoice->id,
+                    ]);
+                    $treasury->increment('balance', $payment->amount);
+                }
             });
 
-            // Redirect to payment receipt print page
             return redirect()
                 ->route('payments.receipt', $payment->id)
                 ->with('success', 'تم إضافة الدفعة بنجاح');
@@ -67,7 +70,6 @@ class InvoicePaymentController extends Controller
     public function receipt(InvoicePayment $payment)
     {
         $payment->load(['invoice.customer', 'invoice.items.service', 'createdBy']);
-        
         return view('payments.receipt', compact('payment'));
     }
 
@@ -94,7 +96,25 @@ class InvoicePaymentController extends Controller
         ]);
 
         try {
-            $payment->update(['status' => $request->status]);
+            DB::transaction(function () use ($request, $payment) {
+                $oldStatus = $payment->status;
+                $payment->update(['status' => $request->status]);
+
+                $treasury = Treasury::first();
+                if ($treasury && $oldStatus !== $payment->status) {
+                    if ($request->status === 'cancelled' && $oldStatus === 'completed') {
+                        // خصم المبلغ من الخزنة
+                        Transaction::create([
+                            'treasury_id' => $treasury->id,
+                            'type' => 'withdrawal',
+                            'amount' => $payment->amount,
+                            'description' => "إلغاء دفعة فاتورة #{$payment->invoice->invoice_number}",
+                            'invoice_id' => $payment->invoice_id,
+                        ]);
+                        $treasury->decrement('balance', $payment->amount);
+                    }
+                }
+            });
 
             return redirect()
                 ->back()
@@ -114,6 +134,19 @@ class InvoicePaymentController extends Controller
     {
         try {
             DB::transaction(function () use ($payment) {
+                $treasury = Treasury::first();
+
+                if ($treasury && $payment->status === 'completed') {
+                    Transaction::create([
+                        'treasury_id' => $treasury->id,
+                        'type' => 'withdrawal',
+                        'amount' => $payment->amount,
+                        'description' => "حذف دفعة فاتورة #{$payment->invoice->invoice_number}",
+                        'invoice_id' => $payment->invoice_id,
+                    ]);
+                    $treasury->decrement('balance', $payment->amount);
+                }
+
                 $payment->delete();
             });
 
