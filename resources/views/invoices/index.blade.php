@@ -1059,9 +1059,9 @@
             'customer_name' => $invoice->customer->name,
             'total' => $invoice->total,
             'status' => $invoice->status,
-            'invoice_date' => \Carbon\Carbon::parse($invoice->delivery_date)->format('Y-m-d'),
+            'delivery_date' => \Carbon\Carbon::parse($invoice->delivery_date)->format('Y-m-d'),
         ];
-    })->groupBy('invoice_date');
+    })->groupBy('delivery_date');
 @endphp
 
 
