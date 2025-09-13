@@ -1050,20 +1050,22 @@
     }
 }
 </style>
-
 @php
     $calendarInvoices = $invoices->map(function($invoice) {
         return [
-            'id' => $invoice->id,
+            'id'             => $invoice->id,
             'invoice_number' => $invoice->invoice_number,
-            'customer_name' => $invoice->customer->name,
-            'total' => $invoice->total,
-            'status' => $invoice->status,
-            'delivery_date' => \Carbon\Carbon::parse($invoice->delivery_date)->format('Y-m-d'),
+            'customer_name'  => $invoice->customer->name,
+            'total'          => $invoice->total,
+            'status'         => $invoice->status,
+            'delivery_date'  => $invoice->delivery_date 
+                                ? \Carbon\Carbon::parse($invoice->delivery_date)->format('Y-m-d') 
+                                : null,
         ];
-    })->groupBy('delivery_date');
+    })
+    ->filter(fn($inv) => $inv['delivery_date'] !== null) // استبعد اللي ما عندها تاريخ
+    ->groupBy('delivery_date');
 @endphp
-
 
 <script>
 let currentDate = new Date();
