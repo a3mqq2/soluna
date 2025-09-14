@@ -28,7 +28,7 @@ class InvoicePaymentController extends Controller
         try {
             $payment = null;
 
-            DB::transaction(function () use ($request, $invoice, &$payment) {
+            DB::transaction(function () use ($request, $invoice, $payment) {
                 $payment = $invoice->addPayment([
                     'amount' => $request->amount,
                     'payment_method' => $request->payment_method,
@@ -38,7 +38,6 @@ class InvoicePaymentController extends Controller
                     'status' => 'completed',
                 ]);
 
-                // 📌 تحديث الخزنة
                 $treasury = Treasury::first();
                 if ($treasury) {
                     Transaction::create([
@@ -52,9 +51,7 @@ class InvoicePaymentController extends Controller
                 }
             });
 
-            return redirect()
-                ->route('payments.receipt', $payment->id)
-                ->with('success', 'تم إضافة الدفعة بنجاح');
+            return redirect()->back()->with('success', 'تمت اضافة دفعة بنجاح');
 
         } catch (\Exception $e) {
             return redirect()

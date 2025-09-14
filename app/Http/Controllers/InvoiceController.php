@@ -6,7 +6,9 @@ use App\Models\Coupon;
 use App\Models\Invoice;
 use App\Models\Service;
 use App\Models\Customer;
+use App\Models\Treasury;
 use App\Models\InvoiceItem;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -131,6 +133,18 @@ class InvoiceController extends Controller
                     'status' => 'completed',
                     'notes' => 'دفعة بعد التحديث',
                 ]);
+
+                $treasury = Treasury::first();
+                if ($treasury) {
+                    Transaction::create([
+                        'treasury_id' => $treasury->id,
+                        'type' => 'deposit',
+                        'amount' => $validated['paid_amount'],
+                        'description' => "دفعة من فاتورة #{$invoice->invoice_number}",
+                        'invoice_id' => $invoice->id,
+                    ]);
+                    $treasury->increment('balance', $validated['paid_amount']);
+                }
             }
             
         
