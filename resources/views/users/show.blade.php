@@ -20,19 +20,13 @@
                 <span class="badge {{ $user->status_class }}">{{ $user->status }}</span>
                 
                 <div class="row mt-4">
-                    <div class="col-4">
-                        <div class="d-flex flex-column">
-                            <span class="text-muted small">المؤسسات</span>
-                            <strong>{{ $user->institutions_count }}</strong>
-                        </div>
-                    </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="d-flex flex-column">
                             <span class="text-muted small">الصلاحيات</span>
                             <strong>{{ $user->permissions_count }}</strong>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="d-flex flex-column">
                             <span class="text-muted small">الأدوار</span>
                             <strong>{{ $user->roles_count }}</strong>
@@ -84,58 +78,10 @@
         </div>
     </div>
 
-    <!-- تفاصيل المؤسسات والصلاحيات -->
+    <!-- تفاصيل الصلاحيات -->
     <div class="col-md-8">
-        <!-- المؤسسات -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">المؤسسات المرتبطة ({{ $user->institutions->count() }})</h6>
-            </div>
-            <div class="card-body">
-                @if($user->institutions->count() > 0)
-                    <div class="row">
-                        @foreach($user->institutions as $institution)
-                            <div class="col-md-6 mb-3">
-                                <div class="d-flex align-items-center p-3 border rounded">
-                                    <img src="{{ Storage::url($institution->logo) }}" 
-                                         alt="{{ $institution->name }}" 
-                                         class="rounded-circle me-3"
-                                         style="width: 50px; height: 50px;">
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">{{ $institution->name }}</h6>
-                                        <small class="text-muted">
-                                            <span class="badge badge-success">{{ $institution->status }}</span>
-                                            @if($institution->departments_count > 0)
-                                                • {{ $institution->departments_count }} قسم
-                                            @endif
-                                            @if($institution->users_count > 0)
-                                                • {{ $institution->users_count }} مستخدم
-                                            @endif
-                                        </small>
-                                    </div>
-                                    <div class="text-end">
-                                        <small class="text-muted">
-                                            {{ $institution->pivot->created_at ? $institution->pivot->created_at->format('Y-m-d') : '' }}
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-4">
-                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">لا يوجد مؤسسات مرتبطة بهذا المستخدم</p>
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i>إضافة مؤسسات
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-
         <!-- الصلاحيات -->
-        <div class="card mt-3">
+        <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h6 class="mb-0">الصلاحيات ({{ $user->permissions->count() }})</h6>
                 <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-primary">

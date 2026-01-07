@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -16,7 +15,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::with(['roles', 'permissions', 'institutions']);
+        $query = User::with(['roles', 'permissions']);
 
         // Search functionality
         if ($request->has('search') && $request->search != '') {
@@ -29,11 +28,6 @@ class UserController extends Controller
         // Filter by status
         if ($request->has('status') && $request->status != '') {
             $query->where('is_active', $request->status == 'active');
-        }
-
-        // Filter by institution
-        if ($request->has('institution') && $request->institution != '') {
-            $query->byInstitution($request->institution);
         }
 
         // Sorting
@@ -51,9 +45,8 @@ class UserController extends Controller
         }
 
         $users = $query->paginate(10);
-        $institutions = Institution::active()->orderBy('name')->get();
 
-        return view('users.index', compact('users', 'institutions'));
+        return view('users.index', compact('users'));
     }
 
     /**
@@ -62,8 +55,7 @@ class UserController extends Controller
     public function create()
     {
         $permissions = Permission::all();
-        $institutions = Institution::active()->orderBy('name')->get();
-        return view('users.create', compact('permissions', 'institutions'));
+        return view('users.create', compact('permissions'));
     }
 
     /**
@@ -76,7 +68,6 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'is_active' => 'sometimes|boolean',
-            'institution_id' => "required",
         ]);
 
         $user = User::create([
@@ -84,7 +75,6 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'is_active' => $request->has('is_active') ? $request->is_active : true,
-            'institution_id' => $request->institution_id,
         ]);
 
         // ربط الصلاحيات
@@ -100,7 +90,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load(['institutions', 'roles', 'permissions']);
+        $user->load(['roles', 'permissions']);
         return view('users.show', compact('user'));
     }
 
@@ -110,9 +100,8 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $permissions = Permission::all();
-        $institutions = Institution::active()->orderBy('name')->get();
-        $user->load(['institutions', 'permissions']);
-        return view('users.edit', compact('user', 'permissions', 'institutions'));
+        $user->load(['permissions']);
+        return view('users.edit', compact('user', 'permissions'));
     }
 
     /**
@@ -131,16 +120,12 @@ class UserController extends Controller
             ],
             'password' => 'nullable|string|min:8|confirmed',
             'is_active' => 'sometimes|boolean',
-            'institution_id' => 'required',
         ]);
-
-
 
         $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'is_active' => $request->has('is_active') ? $request->is_active : false,
-            'institution_id' => $request->institution_id,
         ];
 
         // Only update password if provided
@@ -152,9 +137,6 @@ class UserController extends Controller
 
         // تحديث الصلاحيات
         $user->syncPermissions($request->input('permissions', []));
-
-        // تحديث المؤسسات
-        $user->syncInstitutions($request->input('institutions', []));
 
         return redirect()->route('users.index')
                         ->with('success', 'تم تحديث المستخدم بنجاح');
@@ -231,10 +213,4 @@ class UserController extends Controller
                         ->with('success', $message);
     }
 
-  
-    public function byInstitution(Institution $institution)
-    {
-        $users = $institution->users()->with(['roles', 'permissions'])->paginate(10);
-        return view('users.by-institution', compact('users', 'institution'));
-    }
 }

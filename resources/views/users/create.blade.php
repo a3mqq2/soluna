@@ -38,18 +38,6 @@
                         <input type="password" name="password_confirmation" required class="form-control">
                      </div>
 
-                     <div class="col-md-12">
-                        <div class="form-group">
-                           <label for="">حدد مؤسسة</label>
-                           <select name="institution_id" id="" class="form-control">
-                              <option value="">حدد مؤسسة</option>
-                              @foreach ($institutions as $institution)
-                                  <option value="{{$institution->id}}">{{$institution->name}}</option>
-                              @endforeach
-                           </select>
-                        </div>
-                     </div>
-
                      <!-- قسم الصلاحيات -->
                      <div class="col-md-12 mt-4">
                         <label for="">صلاحيات الوصول</label>
@@ -106,31 +94,13 @@
    </div>
 </div>
 @endsection
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // تحديد/إلغاء تحديد جميع المؤسسات
-    const selectAllInstitutions = document.getElementById('select_all_institutions');
-    const institutionCheckboxes = document.querySelectorAll('.institution-checkbox');
-    
-    selectAllInstitutions.addEventListener('change', function() {
-        institutionCheckboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-
-    // تحديث حالة "تحديد الكل" عند تغيير المؤسسات
-    institutionCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const checkedCount = document.querySelectorAll('.institution-checkbox:checked').length;
-            selectAllInstitutions.checked = checkedCount === institutionCheckboxes.length;
-            selectAllInstitutions.indeterminate = checkedCount > 0 && checkedCount < institutionCheckboxes.length;
-        });
-    });
-
     // تحديد/إلغاء تحديد جميع الصلاحيات
     const selectAllPermissions = document.getElementById('select_all_permissions');
     const permissionCheckboxes = document.querySelectorAll('.permission-checkbox');
-    
+
     selectAllPermissions.addEventListener('change', function() {
         permissionCheckboxes.forEach(checkbox => {
             checkbox.checked = this.checked;

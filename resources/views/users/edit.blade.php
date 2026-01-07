@@ -41,19 +41,6 @@
                         <input type="password" name="password_confirmation" class="form-control">
                      </div>
 
-                     <div class="col-md-12">
-                        <div class="form-group">
-                           <label for="">حدد مؤسسة</label>
-                           <select name="institution_id" id="" class="form-control">
-                              <option value="">حدد مؤسسة</option>
-                              @foreach ($institutions as $institution)
-                                  <option value="{{$institution->id}}" {{$user->institution_id == $institution->id ? "selected" : ""}} >{{$institution->name}}</option>
-                              @endforeach
-                           </select>
-                        </div>
-                     </div>
-
-
                      <!-- قسم الصلاحيات -->
                      <div class="col-md-12 mt-4">
                         <label for="">صلاحيات الوصول</label>
@@ -105,7 +92,6 @@
                            <ul class="mb-0 mt-2">
                               <li>تاريخ الإنشاء: {{ $user->created_at->format('Y-m-d H:i:s') }}</li>
                               <li>آخر تحديث: {{ $user->updated_at->format('Y-m-d H:i:s') }}</li>
-                              <li>عدد المؤسسات الحالية: {{ $user->institutions_count }}</li>
                               <li>عدد الصلاحيات الحالية: {{ $user->permissions_count }}</li>
                            </ul>
                         </div>
@@ -131,33 +117,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // تحديد/إلغاء تحديد جميع المؤسسات
-    const selectAllInstitutions = document.getElementById('select_all_institutions');
-    const institutionCheckboxes = document.querySelectorAll('.institution-checkbox');
-    
-    // تحديث حالة "تحديد الكل" عند تحميل الصفحة
-    updateSelectAllStatus(institutionCheckboxes, selectAllInstitutions);
-    
-    selectAllInstitutions.addEventListener('change', function() {
-        institutionCheckboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-
-    // تحديث حالة "تحديد الكل" عند تغيير المؤسسات
-    institutionCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            updateSelectAllStatus(institutionCheckboxes, selectAllInstitutions);
-        });
-    });
-
     // تحديد/إلغاء تحديد جميع الصلاحيات
     const selectAllPermissions = document.getElementById('select_all_permissions');
     const permissionCheckboxes = document.querySelectorAll('.permission-checkbox');
-    
+
     // تحديث حالة "تحديد الكل" عند تحميل الصفحة
     updateSelectAllStatus(permissionCheckboxes, selectAllPermissions);
-    
+
     selectAllPermissions.addEventListener('change', function() {
         permissionCheckboxes.forEach(checkbox => {
             checkbox.checked = this.checked;
@@ -172,9 +138,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function updateSelectAllStatus(checkboxes, selectAllCheckbox) {
-        const checkedCount = document.querySelectorAll(checkboxes[0].className.split(' ')[0] + ':checked').length;
+        if (checkboxes.length === 0) return;
+        const checkedCount = document.querySelectorAll('.permission-checkbox:checked').length;
         const totalCount = checkboxes.length;
-        
+
         selectAllCheckbox.checked = checkedCount === totalCount;
         selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
     }

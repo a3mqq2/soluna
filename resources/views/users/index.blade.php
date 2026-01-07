@@ -79,8 +79,6 @@
 
             <!-- Bulk Actions -->
             <div class="card-body border-bottom">
-                <form id="bulkActionForm" method="POST" action="{{ route('users.bulk-action') }}">
-                    @csrf
                     <div class="row align-items-center">
                         <div class="col-md-4">
                             <div class="form-check">
@@ -105,7 +103,6 @@
                             </button>
                         </div>
                     </div>
-                </form>
             </div>
 
             <!-- Users Table -->
