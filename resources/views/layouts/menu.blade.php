@@ -121,7 +121,7 @@
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
-      <i class="ti ti-user-cog"></i>
+      <i class="ti ti-users"></i>
     </span>
     <span class="pc-mtext">المستخدمين</span>
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
