@@ -12,6 +12,7 @@ class Transaction extends Model
     protected $fillable = [
         'treasury_id',
         'invoice_id',
+        'user_id',
         'type',
         'amount',
         'description',
@@ -27,5 +28,20 @@ class Transaction extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // تسجيل المُعِد تلقائياً عند الإنشاء
+        static::creating(function ($transaction) {
+            if (!$transaction->user_id && auth()->check()) {
+                $transaction->user_id = auth()->id();
+            }
+        });
+    }
 }

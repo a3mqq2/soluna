@@ -162,7 +162,13 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['customer', 'items.service']);
+        $invoice->load([
+            'customer',
+            'items.service',
+            'payments.createdBy',
+            'expenses.createdBy',
+            'user'
+        ]);
         if(request('print'))
         {
             return view('invoices.print', compact('invoice'));

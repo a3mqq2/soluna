@@ -14,7 +14,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $query = Transaction::with(['treasury','invoice'])->latest();
+        $query = Transaction::with(['treasury', 'invoice', 'user'])->latest();
     
         if (request('type')) {
             $query->where('type', request('type'));

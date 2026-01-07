@@ -492,6 +492,102 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Activity Log -->
+            <div class="invoice-card">
+                <div class="card-header">
+                    <h6><i class="ti ti-history me-2"></i>سجل الحركات</h6>
+                </div>
+                <div class="card-body p-0">
+                    @php
+                        // جمع كل الحركات (دفعات + مصروفات) وترتيبها زمنياً
+                        $activities = collect();
+
+                        // إضافة الدفعات
+                        foreach($invoice->payments as $payment) {
+                            $activities->push([
+                                'type' => 'payment',
+                                'date' => $payment->payment_date,
+                                'created_at' => $payment->created_at,
+                                'user' => optional($payment->createdBy)->name ?? 'غير محدد',
+                                'description' => 'دفعة بمبلغ ' . number_format($payment->amount, 3) . ' د.ل - ' . $payment->payment_method_name,
+                                'amount' => $payment->amount,
+                                'icon' => 'ti-cash',
+                                'color' => 'success'
+                            ]);
+                        }
+
+                        // إضافة المصروفات
+                        foreach($invoice->expenses as $expense) {
+                            $activities->push([
+                                'type' => 'expense',
+                                'date' => $expense->created_at->toDateString(),
+                                'created_at' => $expense->created_at,
+                                'user' => optional($expense->createdBy)->name ?? 'غير محدد',
+                                'description' => 'مصروف: ' . $expense->description . ' - ' . number_format($expense->amount, 3) . ' د.ل',
+                                'amount' => $expense->amount,
+                                'icon' => 'ti-receipt-2',
+                                'color' => 'danger'
+                            ]);
+                        }
+
+                        // إضافة إنشاء الفاتورة
+                        $activities->push([
+                            'type' => 'invoice',
+                            'date' => $invoice->invoice_date->toDateString(),
+                            'created_at' => $invoice->created_at,
+                            'user' => optional($invoice->user)->name ?? 'غير محدد',
+                            'description' => 'إنشاء الفاتورة',
+                            'amount' => $invoice->total,
+                            'icon' => 'ti-file-plus',
+                            'color' => 'primary'
+                        ]);
+
+                        // ترتيب تنازلي حسب تاريخ الإنشاء
+                        $activities = $activities->sortByDesc('created_at');
+                    @endphp
+
+                    @if($activities->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-elegant">
+                                <thead>
+                                    <tr>
+                                        <th width="50"></th>
+                                        <th>التاريخ</th>
+                                        <th>المُعِد</th>
+                                        <th>التفاصيل</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($activities as $activity)
+                                    <tr>
+                                        <td class="text-center">
+                                            <span class="badge bg-{{ $activity['color'] }}" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                                <i class="ti {{ $activity['icon'] }}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{ \Carbon\Carbon::parse($activity['date'])->format('Y/m/d') }}
+                                            <br>
+                                            <small class="text-muted">{{ $activity['created_at']->format('H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold">{{ $activity['user'] }}</span>
+                                        </td>
+                                        <td>{{ $activity['description'] }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i class="ti ti-history display-4 text-muted"></i>
+                            <p class="text-muted mt-2">لا توجد حركات مسجلة</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <!-- Right Column - Summary & Actions -->

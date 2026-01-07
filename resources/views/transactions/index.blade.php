@@ -77,6 +77,7 @@
                            <th>المبلغ</th>
                            <th>الوصف</th>
                            <th>الفاتورة / الزبون</th>
+                           <th>المُعِد</th>
                            <th>التاريخ</th>
                        </tr>
                    </thead>
@@ -102,7 +103,7 @@
                                            </a>
                                            @if(optional($transaction->invoice->customer)->name)
                                                <div class="small text-muted">
-                                                   👤 {{ $transaction->invoice->customer->name }}
+                                                   {{ $transaction->invoice->customer->name }}
                                                </div>
                                            @endif
                                        </div>
@@ -110,11 +111,21 @@
                                        -
                                    @endif
                                </td>
+                               <td>
+                                   @if($transaction->user)
+                                       <span class="badge bg-light text-dark">
+                                           <i class="ti ti-user me-1"></i>
+                                           {{ $transaction->user->name }}
+                                       </span>
+                                   @else
+                                       <span class="text-muted">-</span>
+                                   @endif
+                               </td>
                                <td>{{ $transaction->created_at?->format('Y/m/d H:i') }}</td>
                            </tr>
                        @empty
                            <tr>
-                               <td colspan="7" class="text-center py-4 text-muted">
+                               <td colspan="8" class="text-center py-4 text-muted">
                                    <i class="ti ti-file-off fs-1 d-block mb-2"></i>
                                    لا توجد معاملات مطابقة
                                </td>
