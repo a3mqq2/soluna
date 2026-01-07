@@ -7,7 +7,7 @@
   </a>
 </li>
 
-@can('invoices.view')
+@can('invoices')
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -17,11 +17,9 @@
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
   </a>
   <ul class="pc-submenu">
-    @can('invoices.create')
     <li class="pc-item">
       <a class="pc-link" href="{{ route('invoices.create') }}">إنشاء فاتورة جديدة</a>
     </li>
-    @endcan
     <li class="pc-item">
       <a class="pc-link" href="{{ route('invoices.index') }}">قائمة المناسبات</a>
     </li>
@@ -29,7 +27,7 @@
 </li>
 @endcan
 
-@can('treasury.view')
+@can('treasury')
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -39,11 +37,9 @@
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
   </a>
   <ul class="pc-submenu">
-    @can('treasury.create')
     <li class="pc-item">
       <a class="pc-link" href="{{ route('transactions.create') }}">إضافة معاملة جديدة</a>
     </li>
-    @endcan
     <li class="pc-item">
       <a class="pc-link" href="{{ route('transactions.index') }}">قائمة المعاملات</a>
     </li>
@@ -51,7 +47,7 @@
 </li>
 @endcan
 
-@can('services.view')
+@can('services')
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -61,11 +57,9 @@
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
   </a>
   <ul class="pc-submenu">
-    @can('services.create')
     <li class="pc-item">
       <a class="pc-link" href="{{ route('services.create') }}">إضافة خدمة جديدة</a>
     </li>
-    @endcan
     <li class="pc-item">
       <a class="pc-link" href="{{ route('services.index') }}">قائمة الخدمات</a>
     </li>
@@ -73,7 +67,7 @@
 </li>
 @endcan
 
-@can('customers.view')
+@can('customers')
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -83,11 +77,9 @@
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
   </a>
   <ul class="pc-submenu">
-    @can('customers.create')
     <li class="pc-item">
       <a class="pc-link" href="{{ route('customers.create') }}">إضافة زبون جديد</a>
     </li>
-    @endcan
     <li class="pc-item">
       <a class="pc-link" href="{{ route('customers.index') }}">قائمة الزبائن</a>
     </li>
@@ -95,7 +87,7 @@
 </li>
 @endcan
 
-@can('coupons.view')
+@can('coupons')
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -105,11 +97,9 @@
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
   </a>
   <ul class="pc-submenu">
-    @can('coupons.create')
     <li class="pc-item">
       <a class="pc-link" href="{{ route('coupons.create') }}">إضافة كوبون جديد</a>
     </li>
-    @endcan
     <li class="pc-item">
       <a class="pc-link" href="{{ route('coupons.index') }}">قائمة الكوبونات</a>
     </li>
@@ -117,7 +107,7 @@
 </li>
 @endcan
 
-@can('users.view')
+@can('users')
 <li class="pc-item pc-hasmenu">
   <a href="#!" class="pc-link">
     <span class="pc-micon">
@@ -127,11 +117,9 @@
     <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
   </a>
   <ul class="pc-submenu">
-    @can('users.create')
     <li class="pc-item">
       <a class="pc-link" href="{{ route('users.create') }}">إضافة مستخدم جديد</a>
     </li>
-    @endcan
     <li class="pc-item">
       <a class="pc-link" href="{{ route('users.index') }}">قائمة المستخدمين</a>
     </li>
@@ -139,7 +127,7 @@
 </li>
 @endcan
 
-@can('reports.view')
+@can('reports')
 <li class="pc-item">
   <a href="{{ route('reports.index') }}" class="pc-link">
     <span class="pc-micon">
