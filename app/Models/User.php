@@ -22,7 +22,6 @@ class User extends Authenticatable
         'email',
         'password',
         'is_active',
-        'institution_id',
     ];
 
     /**
@@ -105,67 +104,5 @@ class User extends Authenticatable
     public function getRolesCountAttribute()
     {
         return $this->roles->count();
-    }
-
-
-    public function institutions()
-    {
-        return $this->belongsToMany(Institution::class, 'user_institutions');
-    }
-
-
-    public function activeInstitutions()
-    {
-        return $this->belongsToMany(Institution::class, 'user_institutions')
-                    ->where('institutions.is_active', true);
-    }
-
-    
-    public function getInstitutionsCountAttribute()
-    {
-        return $this->institutions()->count();
-    }
-
- 
-    public function getActiveInstitutionsCountAttribute()
-    {
-        return $this->activeInstitutions()->count();
-    }
-
-    public function belongsToInstitution($institutionId)
-    {
-        return $this->institutions()->where('institution_id', $institutionId)->exists();
-    }
-
-
-    public function syncInstitutions(array $institutionIds)
-    {
-        return $this->institutions()->sync($institutionIds);
-    }
-
- 
-    public function attachInstitution($institutionId)
-    {
-        return $this->institutions()->attach($institutionId);
-    }
-
-  
-    public function detachInstitution($institutionId)
-    {
-        return $this->institutions()->detach($institutionId);
-    }
-
- 
-    public function scopeByInstitution($query, $institutionId)
-    {
-        return $query->whereHas('institutions', function ($q) use ($institutionId) {
-            $q->where('institution_id', $institutionId);
-        });
-    }
-
-
-    public function institution()
-    {
-        return $this->belongsTo(Institution::class);
     }
 }
